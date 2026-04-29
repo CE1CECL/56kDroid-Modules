@@ -1,0 +1,115 @@
+diff -urN alsa-driver-1.0.23/configure.in alsa-driver-1.0.23-usb_endpoint/configure.in
+--- alsa-driver-1.0.23/configure.in	2010-04-16 07:11:04.000000000 -0400
++++ alsa-driver-1.0.23-usb_endpoint/configure.in	2010-05-17 19:36:53.000000000 -0400
+@@ -1969,6 +1969,66 @@
+   AC_DEFINE(CONFIG_HAVE_PDE)
+ fi
+ 
++dnl Check for usb_endpoint_dir_in
++AC_MSG_CHECKING(for usb_endpoint_dir_in and related functions)
++endpoint_dir_defined="0"
++ac_save_CFLAGS="$CFLAGS"
++ac_save_CC="$CC"
++CFLAGS="$KERNEL_CHECK_CFLAGS -Werror-implicit-function-declaration"
++CC=$KCC
++AC_TRY_COMPILE([
++#define __KERNEL__
++#ifdef CONFIG_HAVE_DEPRECATED_CONFIG_H
++#include <linux/autoconf.h>
++#else
++#include <linux/config.h>
++#endif
++#include <linux/usb.h>
++],[
++       struct usb_endpoint_descriptor *foo;
++       usb_endpoint_dir_in(foo);
++],
++    AC_MSG_RESULT(yes);endpoint_dir_defined="1",
++    AC_MSG_RESULT(no);endpoint_dir_defined="0",
++    AC_MSG_RESULT(unknown);endpoint_dir_defined="0"
++)
++CFLAGS=$ac_save_CFLAGS
++CC=$ac_save_CC
++CONFIG_HAVE_ENDPOINT_DIR=$endpoint_dir_defined
++if test "$CONFIG_HAVE_ENDPOINT_DIR" = "1"; then
++  AC_DEFINE(CONFIG_HAVE_ENDPOINT_DIR)
++fi
++
++dnl Check for usb_endpoint_xfer_control
++AC_MSG_CHECKING(for usb_endpoint_xfer_control)
++endpoint_xfer_defined="0"
++ac_save_CFLAGS="$CFLAGS"
++ac_save_CC="$CC"
++CFLAGS="$KERNEL_CHECK_CFLAGS -Werror-implicit-function-declaration"
++CC=$KCC
++AC_TRY_COMPILE([
++#define __KERNEL__
++#ifdef CONFIG_HAVE_DEPRECATED_CONFIG_H
++#include <linux/autoconf.h>
++#else
++#include <linux/config.h>
++#endif
++#include <linux/usb.h>
++],[
++       struct usb_endpoint_descriptor *foo;
++       usb_endpoint_xfer_control(foo);
++],
++    AC_MSG_RESULT(yes);endpoint_xfer_defined="1",
++    AC_MSG_RESULT(no);endpoint_xfer_defined="0",
++    AC_MSG_RESULT(unknown);endpoint_xfer_defined="0"
++)
++CFLAGS=$ac_save_CFLAGS
++CC=$ac_save_CC
++CONFIG_HAVE_ENDPOINT_XFER=$endpoint_xfer_defined
++if test "$CONFIG_HAVE_ENDPOINT_XFER" = "1"; then
++  AC_DEFINE(CONFIG_HAVE_ENDPOINT_XFER)
++fi
++
+ dnl Check for pci_consistent_set_dma_mask()
+ AC_MSG_CHECKING(for pci_set_consistent_dma_mask)
+ pci_consistent_defined="0"
+diff -urN alsa-driver-1.0.23/include/config.h.in alsa-driver-1.0.23-usb_endpoint/include/config.h.in
+--- alsa-driver-1.0.23/include/config.h.in	2010-04-16 07:11:04.000000000 -0400
++++ alsa-driver-1.0.23-usb_endpoint/include/config.h.in	2010-05-17 19:36:53.000000000 -0400
+@@ -81,6 +81,8 @@
+ #undef CONFIG_SND_NEW_IRQ_HANDLER
+ #undef CONFIG_HAVE_PNP_SUSPEND
+ #undef CONFIG_HAVE_GFP_T
++#undef CONFIG_HAVE_ENDPOINT_DIR
++#undef CONFIG_HAVE_ENDPOINT_XFER
+ #undef CONFIG_HAVE_INIT_UTSNAME
+ #undef CONFIG_SND_HAS_DEVICE_CREATE_DRVDATA
+ #undef CONFIG_HAVE_IS_POWER_OF_2
+diff -urN alsa-driver-1.0.23/usb/usbcompat.h alsa-driver-1.0.23-usb_endpoint/usb/usbcompat.h
+--- alsa-driver-1.0.23/usb/usbcompat.h	2010-04-16 07:11:04.000000000 -0400
++++ alsa-driver-1.0.23-usb_endpoint/usb/usbcompat.h	2010-05-17 19:40:59.000000000 -0400
+@@ -15,8 +15,7 @@
+ }
+ #endif /* < 2.6.24 */
+ 
+-#if !defined(RHEL_RELEASE_CODE) || RHEL_RELEASE_CODE < RHEL_RELEASE_VERSION(5, 4)
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19)
++#ifndef CONFIG_HAVE_ENDPOINT_DIR
+ static inline int usb_endpoint_dir_in(const struct usb_endpoint_descriptor *epd)
+ {
+ 	return ((epd->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN);
+@@ -84,16 +83,15 @@
+ {
+ 	return (usb_endpoint_xfer_isoc(epd) && usb_endpoint_dir_out(epd));
+ }
+-#endif /* < 2.6.19 */
++#endif /* ! CONFIG_HAVE_ENDPOINT_DIR */
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)
++#ifndef CONFIG_HAVE_ENDPOINT_XFER
+ static inline int usb_endpoint_xfer_control(
+ 				const struct usb_endpoint_descriptor *epd)
+ {
+ 	return ((epd->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
+ 		USB_ENDPOINT_XFER_CONTROL);
+ }
+-#endif /* < 2.6.21 */
+-#endif
++#endif /* ! CONFIG_HAVE_ENDPOINT_XFER */
+ 
+ #endif /* __ALSA_USBCOMPAT_H */

@@ -1,0 +1,41 @@
+--- alsa-kernel/pci/hda/patch_conexant.c.DIST	2010-05-17 19:53:19.000000000 -0400
++++ alsa-kernel/pci/hda/patch_conexant.c	2010-11-27 01:53:48.000000000 -0500
+@@ -444,7 +444,7 @@
+ 	struct hda_codec *codec = snd_kcontrol_chip(kcontrol);
+ 	struct conexant_spec *spec = codec->spec;
+ 
+-	return snd_hda_input_mux_info(spec->input_mux, uinfo);
++	return spec->input_mux ? snd_hda_input_mux_info(spec->input_mux, uinfo) : 0;
+ }
+ 
+ static int conexant_mux_enum_get(struct snd_kcontrol *kcontrol,
+@@ -465,9 +465,9 @@
+ 	struct conexant_spec *spec = codec->spec;
+ 	unsigned int adc_idx = snd_ctl_get_ioffidx(kcontrol, &ucontrol->id);
+ 
+-	return snd_hda_input_mux_put(codec, spec->input_mux, ucontrol,
++	return spec->input_mux ? snd_hda_input_mux_put(codec, spec->input_mux, ucontrol,
+ 				     spec->capsrc_nids[adc_idx],
+-				     &spec->cur_mux[adc_idx]);
++				     &spec->cur_mux[adc_idx]) : 0;
+ }
+ 
+ #ifdef CONFIG_SND_HDA_INPUT_JACK
+@@ -3293,7 +3293,7 @@
+ 	struct hda_codec *codec = snd_kcontrol_chip(kcontrol);
+ 	struct conexant_spec *spec = codec->spec;
+ 
+-	return snd_hda_input_mux_info(spec->input_mux, uinfo);
++	return spec->input_mux ? snd_hda_input_mux_info(spec->input_mux, uinfo) : 0;
+ }
+ 
+ static int cxtppch_capture_source_mux_enum_get(struct snd_kcontrol *kcontrol,
+@@ -3314,7 +3314,7 @@
+ 	const struct hda_input_mux *imux = spec->input_mux;
+ 	unsigned int idx;
+ 
+-	if (!imux->num_items)
++	if (!imux || !imux->num_items)
+ 		return 0;
+ 	idx = ucontrol->value.enumerated.item[0];
+ 	if (idx >= imux->num_items)

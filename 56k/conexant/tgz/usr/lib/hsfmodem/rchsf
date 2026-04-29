@@ -1,0 +1,63 @@
+#
+# chkconfig: 2345 09 91
+# description: Conexant HSF softmodem
+#
+### BEGIN INIT INFO
+# Provides: hsf
+# Should-Start: hotplug coldplug
+# Required-Start: $local_fs
+# Required-Stop: $network
+# Default-Start: 3 5
+# Default-Stop: 0 1 2 6
+# Description: Start Conexant HSF softmodem
+### END INIT INFO
+
+if [ -e /etc/runlevels ]; then
+	begincmd="ebegin"
+	endcmd="eend"
+else
+	begincmd="echo"
+	endcmd="/bin/true"
+fi
+
+
+start()
+{
+	${begincmd} "Starting Conexant HSF softmodem"
+	/usr/sbin/hsfconfig --rcstart
+	${endcmd} 0
+}
+
+stop()
+{
+	${begincmd} "Stopping Conexant HSF softmodem"
+	/usr/sbin/hsfconfig --rcstop
+	${endcmd} 0
+}
+
+restart()
+{
+	stop
+	start
+}
+
+if [ ! -e /etc/runlevels ]; then
+	case "$1" in
+      start)
+			start
+			;;
+      stop)
+			stop
+			;;
+      restart|force-reload|reload)
+			restart
+			;;
+      status)
+			exit 3
+			;;
+      *)
+			echo "Usage: $0 {start|stop|status|try-restart|restart|force-reload|reload}"
+			exit 1
+			;;
+	esac
+fi

@@ -1,0 +1,16 @@
+diff -urN alsa-driver-git20081128/alsa-kernel/pci/hda/hda_intel.c alsa-driver-git20081128-thinkpad/alsa-kernel/pci/hda/hda_intel.c
+--- alsa-driver-git20081128/alsa-kernel/pci/hda/hda_intel.c	2008-11-28 11:41:59.000000000 -0500
++++ alsa-driver-git20081128-thinkpad/alsa-kernel/pci/hda/hda_intel.c	2008-11-28 15:35:33.000000000 -0500
+@@ -2068,9 +2068,9 @@
+ 	/* Thinkpad often breaks the controller communication when accessing
+ 	 * to the non-working (or non-existing) modem codec slot.
+ 	 */
+-	SND_PCI_QUIRK(0x1014, 0x05b7, "Thinkpad Z60", 0x01),
+-	SND_PCI_QUIRK(0x17aa, 0x2010, "Thinkpad X/T/R60", 0x01),
+-	SND_PCI_QUIRK(0x17aa, 0x20ac, "Thinkpad X/T/R61", 0x01),
++	SND_PCI_QUIRK(0x1014, 0x05b7, "Thinkpad Z60", 0x03),
++	SND_PCI_QUIRK(0x17aa, 0x2010, "Thinkpad X/T/R60", 0x03),
++	SND_PCI_QUIRK(0x17aa, 0x20ac, "Thinkpad X/T/R61", 0x03),
+ 	/* broken BIOS */
+ 	SND_PCI_QUIRK(0x1028, 0x20ac, "Dell Studio Desktop", 0x01),
+ 	/* including bogus ALC268 in slot#2 that conflicts with ALC888 */

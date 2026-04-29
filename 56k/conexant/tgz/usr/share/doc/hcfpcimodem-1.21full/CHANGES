@@ -1,0 +1,904 @@
+Sun May 09 2010 -
+	* Released hcfpcimodem-1.21.
+	* Released hcfusbmodem-1.21powerpc.
+
+Sun May 09 2010 -
+	* Improved compatibility with newer kernels and distributions.
+
+Wed Oct 21 2009 -
+	* Released hcfpcimodem-1.20.
+	* Released hcfusbmodem-1.20powerpc.
+
+Wed Oct 21 2009 -
+	* Improved compatibility with newer kernels and distributions.
+
+Wed Apr 29 2009 -
+	* Released hcfpcimodem-1.19.
+	* Released hcfusbmodem-1.19powerpc.
+
+Wed Apr 29 2009 -
+	* Improved compatibility with newer kernels and distributions.
+
+Thu Dec 18 2008 -
+	* Released hcfpcimodem-1.18.
+	* Released hcfusbmodem-1.18powerpc.
+
+Thu Dec 18 2008 -
+	* Improved compatibility with newer kernels and distributions.
+
+Tue Sep 09 2008 -
+	* Released hcfpcimodem-1.17.
+	* Released hcfusbmodem-1.17powerpc.
+
+Tue Sep 09 2008 -
+	* Improved compatibility with newer kernels and distributions.
+
+Fri Jun 20 2008 -
+	* Released hcfpcimodem-1.16.
+	* Released hcfusbmodem-1.16powerpc.
+
+Fri Jun 20 2008 -
+	* Improved compatibility with newer kernels and distributions.
+
+Mon Mar 24 2008 -
+	* Released hcfpcimodem-1.15.
+	* Released hcfusbmodem-1.15powerpc.
+
+Mon Mar 24 2008 -
+	* Improved compatibility with newer kernels and distributions.
+
+Fri Oct 19 2007 -
+	* Released hcfpcimodem-1.14.
+	* Released hcfusbmodem-1.14powerpc.
+
+Fri Oct 19 2007 -
+	* Improved compatibility with newer kernels and distributions.
+
+Thu May 10 2007 -
+	* Released hcfpcimodem-1.13.
+	* Released hcfusbmodem-1.13powerpc.
+
+Thu May 10 2007 -
+	* Improved compatibility with newer kernels and distributions.
+
+Thu Mar 01 2007 -
+	* Released hcfpcimodem-1.12.
+	* Released hcfusbmodem-1.12powerpc.
+
+Thu Mar 01 2007 -
+	* Reduced stack consumption to accommodate smaller 4k kernel stacks.
+	* Improved compatibility with newer kernels and distributions.
+
+Wed Jan 31 2007 -
+	* Released hcfpcimodem-1.11.
+	* Released hcfusbmodem-1.11powerpc.
+
+Wed Jan 31 2007 -
+	* Improved compatibility with newer kernels and distributions.
+
+Fri Feb 17 2006 -
+	* Released hcfpcimodem-1.10.
+	* Released hcfusbmodem-1.10powerpc.
+
+Fri Feb 17 2006 -
+	* Fixed flow-control issue upon device open.
+	* Merged USB code with HSF.
+	* Improved compatibility with newer kernels and distributions.
+	* Improved patching facility.
+
+Wed Dec 07 2005 -
+	* Released hcfpcimodem-1.09.
+	* Released hcfusbmodem-1.09powerpc.
+
+Wed Dec 07 2005 -
+	* Fixed PAGE_OFFSET issue causing crashes during initialization
+	on some systems.
+	* Improved compatibility with newer kernels and distributions.
+	* Improved patching facility.
+
+Fri Oct 21 2005 -
+	* Released hcfpcimodem-1.08.
+	* Released hcfusbmodem-1.08powerpc.
+
+Fri Oct 21 2005 -
+	* Improved compatibility with newer kernels and distributions.
+
+Thu Sep 22 2005 -
+	* Released hcfpcimodem-1.07.
+	* Released hcfusbmodem-1.07powerpc.
+
+Mon Sep 19 2005 -
+	* Added --patch option to config script for easier installation of patches.
+	* Improved Debian and Gentoo compatibility.
+	* Improved compatibility with newer kernels.
+
+Mon Jun 20 2005 -
+	* Released hcfpcimodem-1.06.
+	* Released hcfusbmodem-1.06powerpc.
+
+Mon Jun 20 2005 -
+	* Added support for Fedora Core 4.
+	* Added support for gcc 4.0.
+	* Added support for pre-built debian binary packages.
+	* Added checks to warn about kernel configuration options which are
+	known to be problematic on some systems.
+	* Added support for Freedows.
+	* Added detection of Ubuntu, Knoppix, Mepis and Freedows distributions.
+	* Improved kernel header checks.
+
+Wed Mar 09 2005 -
+	* Fixed small bug in NVM uninstall.
+	* Added check to ensure install partition supports symbolic links.
+
+Thu Mar 03 2005 -
+	* Released hcfpcimodem-1.05.
+	* Released hcfusbmodem-1.05powerpc.
+
+Thu Mar 03 2005 -
+	* Added support for 2.6.11 kernels.
+
+Fri Dec 31 2004 -
+	* Released hcfusbmodem-1.04powerpc.
+
+Fri Dec 31 2004 -
+	* PPC execve issue.
+
+Thu Dec 30 2004 -
+	* Released hcfpcimodem-1.03.
+
+Thu Dec 30 2004 -
+	* Compatibility improvements.
+	* Fixed OsSleep() bug.
+
+Tue Dec 14 2004 -
+	* Released hcfpcimodem-1.02.
+	* Released hcfusbmodem-1.02powerpc.
+
+Tue Dec 14 2004 -
+	* Various compatibility improvements.
+	* Added --uninstall option to config script.
+	* Centralized .in file generation.
+	* Modified scripts to use /var/run/ for temp files.
+	* Fixed pppd connect / deadlock issue under 2.6.
+	* Fixed reading /proc/driver/hsf/*/lastcallstatus with non-zero offset.
+	* Changed module install location from /lib/modules/`uname -r`/misc
+	to /lib/modules/`uname -r`/extra.
+
+Mon Nov 15 2004 -
+	* Released hcfpcimodem-1.01lnxt04111500.
+	* Released hcfusbmodem-1.01lnxt04111500powerpc.
+
+Mon Nov 15 2004 -
+	* Fixed module building issues.
+
+Fri Nov 12 2004 -
+	* Released hcfpcimodem-1.01lnxt04111200.
+	* Released hcfusbmodem-1.01lnxt04111200powerpc.
+
+Fri Nov 12 2004 -
+	* Added pre-built binary packages for Sun JDS Release 2.
+	* Added udev rules for newer distributions.
+	* Fixed USB interface issues.
+	* Removed inline attribute for osusb.c:ChangeUrbListEntryState().
+	* Removed obsolete serial probeall line from modules.conf.
+	* Improved compatibility with kernel build environment.
+	* Clarified messages about conflicting modules.
+
+Tue Aug 24 2004 -
+	* Released hcfpcimodem-1.01lnxt04082400.
+	* Released hcfusbmodem-1.01lnxt04082400powerpc.
+
+Mon Aug 23 2004 -
+	* Added automatic detection and disabling of conflicting modules.
+	* Added rc startup script to automatically build kernel modules
+	if necessary (and feasible, only with generic packages) and load them.
+	* Added support for /etc/modprobe.d and workaround for udev (modules
+	remain loaded after installation).
+
+Thu Jul 29 2004 -
+	* Released hcfpcimodem-1.01lnxt04072900.
+	* Released hcfusbmodem-1.01lnxt04072900powerpc.
+
+Thu Jul 29 2004 -
+	* Fixed build issues with SuSE 2.6.5-7.95 kernel upgrade.
+	* Added support for the latest SuSE 9.1 kernel update (2.6.5-7.75).
+
+Wed Jun 23 2004 -
+	* Released hcfpcimodem-1.01lnxt04062300.
+	* Released hcfusbmodem-1.01lnxt04062300powerpc.
+
+Wed Jun 23 2004 -
+	* Added missing __shimcall__ attributes to Os[V]Sprintf declarations.
+
+Fri Jun 18 2004 -
+	* Released hcfpcimodem-1.01lnxt04061800.
+	* Released hcfusbmodem-1.01lnxt04061800powerpc.
+
+Fri Jun 18 2004 -
+	* Added support for the latest SuSE 9.1 kernel update (2.6.5-7.75).
+
+Sun Jun 13 2004 -
+	* Released hcfusbmodem-1.01lnxt04061300powerpc.
+
+Sun Jun 13 2004 -
+	* Fixed USB issues under 2.6 kernels.
+	* Fixed compilation problem with gcc 3.3.3.
+	* Removed __devinitdata from pci_device_id table.
+
+Thu May 13 2004 -
+	* Released hcfpcimodem-1.01lnxt04051300.
+	* Released hcfusbmodem-1.01lnxt04051300powerpc.
+
+Thu May 13 2004 -
+	* Added check to ensure config script is executed as root.
+
+Sat May 08 2004 -
+	* Released hcfpcimodem-1.01lnxt04050100.
+	* Released hcfusbmodem-1.01lnxt04050100powerpc.
+
+Sat May 08 2004 -
+	* Fixed regParm issue causing crashes on SuSE 9.1.
+
+Sat May 01 2004 -
+	* Released hcfpcimodem-1.01lnxt04050100.
+	* Released hcfusbmodem-1.01lnxt04050100powerpc.
+
+Fri Apr 30 2004 -
+	* Corrected MODULE_LICENSE() in mod_engine.c to ensure tainting.
+
+Sun Apr 25 2004 -
+	* Added KBUILD_EXTMOD support.
+
+Sun Apr 18 2004 -
+	* Changed ppc arch name to powerpc for dpkg.
+
+Tue Apr 13 2004 -
+	* Released hcfpcimodem-1.01lnxt04041300.
+	* Released hcfusbmodem-1.01lnxt04041300ppc.
+
+Tue Apr 13 2004 -
+	* Adjusted serial_core init_termios for minicom.
+
+Sun Mar 28 2004 -
+	* Released hcfpcimodem-1.01lnxt04032800.
+	* Released hcfusbmodem-1.01lnxt04032800ppc.
+
+Sat Mar 27 2004 -
+	* Implemented delayed writes in osnvm and eliminated use of pid file in
+	hsfdcpd to accomodate early module loads on SuSE when root filesystem is
+	still read-only.
+
+Fri Mar 26 2004 -
+	* Fixed "hcf*serial: falsely claims to have parameter calloutmajor" issue.
+	* Support pre-built binary packages for 2.6 kernels.
+	* Support SuSE's new-style kernel config and SetupKernelSource.sh on
+	TurboLinux.
+
+Sat Mar 13 2004 -
+	* Released hcfpcimodem-1.01lnxt04031300.
+	* Released hcfusbmodem-1.01lnxt04031300ppc.
+
+Sat Mar 13 2004 -
+	* Fixed devfs_mk_cdev() issue under 2.6.
+
+Mon Mar 08 2004 -
+	* Released hcfpcimodem-1.01lnxt04030800.
+	* Released hcfusbmodem-1.01lnxt04030800ppc.
+
+Mon Mar 08 2004 -
+	* Merged Conexant changes.
+	* Fixed ppc build issues.
+
+Mon Jan 19 2004 -
+	* Released hcfpcimodem-1.00lnxt04011900.
+	* Released hcfusbmodem-1.00lnxt04011900ppc.
+
+Mon Jan 19 2004 -
+	* Fixed crashes which occured under RedHat's experimental 2.6 kernels.
+	* modules/osservices.c: fixed recursive uniprocessor CriticalSection issue.
+
+Sun Dec 28 2003 -
+	* Released hcfpcimodem-1.00lnxt03122800.
+	* Released hcfusbmodem-1.00lnxt03122800ppc.
+
+Sun Dec 28 2003 -
+	* Added support and pre-built binary packages for Fedora Core 1.
+	* Added pre-built binary packages for the latest RedHat, Mandrake,
+	and Turbolinux kernel updates.
+	* Fixed deprecated tail syntax in kernelcompiler.sh script.
+	* Fixed cnxthwpci_common.c compile issue under 2.6 with older gcc versions.
+	* Added check for CONFIG_SERIAL_CORE to serial_cnxt.c.
+	* Added check for disabled kernel.modprobe (set to /bin/true by 2.4
+	rc.sysinit script looking for /proc/ksyms instead of /proc/kallsyms).
+
+Fri Nov 21 2003 -
+	* Added Turbolinux support.
+
+Fri Nov 21 2003 -
+	* Released hcfpcimodem-1.00lnxt03112100.
+
+Fri Nov 21 2003 -
+	* Fixed directory creation issue with NVM_Open() on SuSE 9.0.
+	* Added pre-built binary packages for SuSE 2.4.21-144 kernel update.
+
+Tue Nov 11 2003 -
+	* Released hcfpcimodem-1.00lnxt03111100.
+
+Tue Nov 11 2003 -
+	* Added pre-built binary packages for the following distributions:
+		- Mandrake 9.2
+		- SuSE 9.0
+	* modules/osservices.c: fixed more 2.6-test issues.
+	* scripts/cnxtconfig.in, modules/kernelcompiler.sh: unset LANG.
+
+Sat Oct 11 2003 -
+	* Allow AT+FCLASS=0 in free version for compatibility reasons.
+	* Fixed incorrect documentation symlink on debian.
+	* modules/osstdio.c:OsFSeek() now returns proper value.
+	* scripts/cnxtconfig.in: use depmod -a instead of -A,
+	add char-major- module alias for DCP device and
+	update_module_dependencies after removing modules.
+	* scripts/cnxtstop.in: exit 0 at end.
+	* modules/osservices.c: fixed to build under latest 2.6-test7 kernels.
+
+Tue Sep 16 2003 -
+	* Released hcfpcimodem-1.00lnxt03091600.
+	* Released hcfusbmodem-1.00lnxt03091600ppc.
+
+Tue Sep 16 2003 -
+	* Corrected slight timing issue with key abort just after dial command.
+	(Thanks to Angus Auld for reporting it)
+
+Fri Sep 12 2003 -
+	* Released hcfpcimodem-1.00lnxt03091200.
+
+Fri Sep 12 2003 -
+	* modules/kernelcompiler.sh: improved to avoid building modules
+	with gcc 2.x for kernels compiled with gcc 3.x. This was the cause
+	of some oops, notably on Debian.
+	* INSTALL: removed reference to common.mak which no longer exists.
+
+Wed Sep 10 2003 -
+	* Released hcfpcimodem-1.00lnxt03091000.
+
+Wed Sep 10 2003 -
+	* cnxtmodem.spec.in: put static nvm parameter files in nvm.tar.gz
+	instead of including them directly in RPMs, to avoid hard links
+	which are not supported by older RPM versions (fixes the
+	"rpmlib(PartialHardLinkSets)" dependency problem).
+
+Tue Sep 09 2003 -
+	* Released hcfpcimodem-1.00lnxt03090900.
+
+Tue Sep 09 2003 -
+	* Fixed issue with non-standard memory configurations.
+
+Mon Sep 08 2003 -
+	* Released hcfpcimodem-1.00lnxt03090800.
+	* Released hcfusbmodem-1.00lnxt03090800ppc.
+
+Wed Sep 03 2003 -
+	* imported/hcfengine.O: merged with latest code from Conexant.
+	* Moved most event processing work from the ISR to a tasklet,
+	to solve timing issues on systems with an enabled APIC
+	(sometimes causing irregular dialing and/or other problems).
+
+Tue Sep 02 2003 -
+	* imported/hcfengine.O: merged with latest code from Conexant.
+
+Fri Aug 29 2003 -
+	* Added support for DIAGMGR (SDK2K) and BLAM.
+
+Thu Aug 28 2003 -
+	* Disabled dialtone detection (ATX3) by default.
+
+Tue Aug 26 2003 -
+	* Added workaround for serial driver falsely claiming to handle
+	our devices.
+
+Mon Aug 25 2003 -
+	* Improved Debian support, added .deb packaging (make debdist).
+
+Sun Aug 24 2003 -
+	* Significant overhaul done during spring/summer 2003, greatly
+	improving modem stability and compatibility!
+	* Added support for 2.6 kernels (presently -test3 and -test4).
+	* Numerous bugs fixed.
+	* config script has been greatly improved.
+	* NVM/.inf handling completely redesigned. Parameters updated.
+	* Multiple device instances now supported, which means that
+	more than one modem can be handled by the driver.
+	* pci_register_driver() used instead of pci_find_device().
+	* Improved SMP support; also preemptible kernels should now work.
+
+Wed May 07 2003 -
+	* inf/hcf_linux.cty, scripts/hcfconfig.in: updated and added
+	BAHRAIN, BANGLADESH, BOLIVIA, BRUNEI, COLOMBIA, COSTA RICA, CYPRUS,
+	DOMINICAN REPUBLIC, ECUADOR, EGYPT, EL SALVADOR, GUATEMALA,
+	HAITI, HONDURAS, KUWAIT, LAOS, LATVIA, LIECHTENSTEIN, MACAO,
+	MALTA, MYANMAR, PAKISTAN, PANAMA, PARAGUAY, PERU, PUERTO RICO, ROMANIA,
+	SAUDI ARABIA, SRI LANKA, UKRAINE, URUGUAY, VENEZUELA, VIETNAM.
+
+Sun Apr 27 2003 -
+	* Released hcfpcimodem-0.99lnxtbeta03042700.
+	* Released hcfusbmodem-0.99lnxtbeta03042703ppc.
+
+Sun Apr 27 2003 -
+	* modules/osspec/osnvm.c: fixed size and byte-ordering issues
+	in NVM_WriteKey(). This caused NO DIALTONE problems on PPC.
+	(Thanks to Benjamin Herrenschmidt for helping track down this issue)
+	* makefile, hcfmodem.spec.in: changes to build packages for newer
+	SuSE versions with i586 arch and athlon kernels.
+	* modules/kernelcompiler.sh: fixed SuSE 8.2 issue.
+	* scripts/hcfconfig.in: fix link problem in create_temp_kernel_tree().
+	* FAQ: updated.
+
+Sat Apr 26 2003 -
+	* imported/hcfengine.O: fixed endianness issue.
+
+Fri Apr 25 2003 -
+	* modules/serial_hcf.c: added support for hard break signal generation.
+
+Fri Apr 25 2003 -
+	* Merged USB version with latest code from Conexant.
+
+Fri Apr 25 2003 -
+	* Released hcfpcimodem-0.99lnxtbeta03042501.
+
+Fri Apr 25 2003 -
+	* imported/hcfengine.O: applied CiDetector workaround for
+	"DownloadDp failure, conf=0xff - bad crc got=0xff,wanted=0x53" problem
+	affecting SmartDAA boards after DTR transitions or hangups.
+
+Fri Apr 25 2003 -
+	* Released hcfpcimodem-0.99lnxtbeta03042500.
+
+Thu Apr 24 2003 -
+	* modules/osspec/osservices.c: support recursive locks and critical
+	sections.
+	* modules/mod_osspec.c: added OsCriticalSection functions and ulLogThread.
+	* modules/osspec/osnvm.c: increased CFILE_BUFFER_SIZE to fix
+	parsing of long PoundUD lines causing growing inf file phenomenon,
+	and modified NVM_WriteKey() to limit line length.
+	* scripts/hcfconfig.in: improved dump_diagnostics() and added --noprobe
+	option. get_current_country_from_inf(): ignore duplicate entries.
+	* inf/hcfv90_linux.inf: added PCI ID 141A:1035 for
+	Apache Micro Peripherals modem.
+	* modules/osspec/include/oscompat.h: OsContextAllowsSleeping().
+	* FAQ: updated.
+
+Fri Apr 18 2003 -
+	* Released hcfpcimodem-0.99lnxtbeta03041800.
+
+Fri Apr 18 2003 -
+	* imported/hcfengine.O: don't use stream/session locks for now.
+	* imported/hcfengine.O: increased buffer size for AT#UG (lastcallstatus).
+	* modules/serial_hcf.c: hcf_get_lastcallstatus(): use length and check
+	offset.
+
+Wed Apr 16 2003 -
+	* Released hcfpcimodem-0.99lnxtbeta03041600.
+
+Wed Apr 16 2003 -
+	* FAQ: major update.
+	* imported/hcfengine.O: merged with latest code from Conexant.
+	* makefile: added rule to sign rpm packages.
+	* modules/osspec/osservices.c: fixed important race in mdmthrd().
+
+Wed Apr 16 2003 -
+	* Added pre-built binary packages for the following
+	distributions/kernel versions:
+		Mandrake 9.1 linux-2.4.21-0.13mdk
+		Mandrake 9.0 linux-2.4.19-32mdk
+		RedHat 9 linux-2.4.20-8 and -9
+		RedHat 8.0 linux-2.4.18-27.8.0
+		SuSE 8.2 2.4.20-4GB
+	* modules/kernelcompiler.sh: updated.
+
+Wed Apr 16 2003 -
+	* modules/osspec/osservices.c: compatibility changes for
+	RedHat 9 and newer 2.5 kernels.
+
+Wed Apr 16 2003 -
+	* Now officially maintained and distributed by Linuxant.
+
+Tue Dec 31 2002 -
+	* Released hcfpcimodem-0.99mbsibeta02123100.
+
+Tue Dec 31 2002 -
+	* Removed prefix from AT+FCLASS=? response, which crept in again
+	causing problems with HylaFAX.
+	(Thanks to Seshareddy Kamireddi for reporting this)
+
+Wed Dec 25 2002 -
+	* Released hcfpcimodem-0.99mbsibeta02122500.
+
+Wed Dec 25 2002 -
+	* imported/hcfengine.O: merged with latest code from Conexant.
+
+Wed Dec 25 2002 -
+	* makefile: added Mandrake 9.0 linux-2.4.19-19mdk kernel.
+	* makefile: added RedHat 2.4.18-19.7.x and 2.4.18-19.8.0 kernels.
+
+Sun Nov 03 2002 -
+	* Released hcfpcimodem-0.98mbsibeta02110301.
+
+Sun Nov 03 2002 -
+	* modules/kernelcompiler.sh: use gcc 3 to build modules for
+	SuSE's 2.4.19-4GB kernel.
+
+Sun Nov 03 2002 -
+	* Released hcfpcimodem-0.98mbsibeta02110300.
+
+Sun Nov 03 2002 -
+	* makefile: added RedHat 2.4.18-17.7.x and 2.4.18-17.8.0 kernels.
+	* makefile: added SuSE 2.4.19-4GB kernel.
+	* modules/kernelcompiler.sh: use gcc 3 to build modules for
+	RedHat's 2.4.18-17.8.0 kernel.
+	* modules/serial_hcf.c: properly test COMCTRL_MONITOR_POUND_UG_SUPPORTED.
+	* scripts/hsfconfig.in: put module configuration in /etc/modules.d and
+	run update-modules if present (for gentoo).
+	* imported/hcfengine.O: limit voice (+FCLASS=8) to recent datapumps (73DP)
+	for now.
+
+Wed Oct 16 2002 -
+	* Released hcfpcimodem-0.98mbsibeta02101002.
+
+Wed Oct 16 2002 -
+	* scripts/hcfconfig.in: optimized auto_find_inf() to compensate for
+	RedHat 8.0 gawk slowness.
+
+Fri Oct 11 2002 -
+	* Released hcfpcimodem-0.98mbsibeta02101001.
+
+Fri Oct 11 2002 -
+	* modules/kernelcompiler.sh: use gcc 3 to build modules for
+	RedHat's 2.4.18-14 kernel.
+
+Thu Oct 10 2002 -
+	* Released hcfpcimodem-0.98mbsibeta02101000.
+
+Thu Oct 10 2002 -
+	* makefile: added RedHat 8.0 linux-2.4.18-14 kernel.
+
+Mon Sep 30 2002 -
+	* makefile: added Mandrake 9.0 linux-2.4.19-16mdk kernel and
+	removed obsolete SuSE 2.4.4-4GB kernel.
+	* modules/kernelcompiler.sh: added gcc-2.96 (for Mandrake 9) and
+	RPM_BUILD_ROOT support.
+	* inf/hcf_linux.cty: Changed INTCODE for SWEDEN from 009 to 00.
+	(Thanks to Anders Helmersson)
+
+Sun Sep 29 2002 -
+	* makefile: tardist: changed way tar.gz files are generated to
+	avoid gzip "decompression OK, trailing garbage ignored" messages.
+
+Mon Sep 23 2002 -
+	* modules/osspec/osservices.c: minor adjustments for 2.5 compatibility.
+	* modules/serial_core.c: uart_register_driver(): set driver_name
+	to drv->owner->name for proper /proc/tty/driver/ naming;
+	renamed HCFSERIAL_INCLUDE_CORE to CNXTSERIAL_INCLUDE_CORE throughout.
+
+Mon Sep 02 2002 -
+	* Released hcfpcimodem-0.98mbsibeta02090200.
+	* Released hcfusbmodem-0.98mbsibeta02090200ppc.
+
+Mon Sep 02 2002 -
+	* imported/hcfengine.O: added fix for hangup problems & fax workaround.
+	* inf/: ATI3 string changed to use new driver (target) name, restored
+	previous fAnalogSpeaker setting in OEM FLAGS.
+	* scripts/hcfconfig.in: fixed awk strtonum issue. (Thanks to Edd Dumbill)
+	* scripts/hcfconfig.in: added @HCFTARGET@ inf substitution keyword.
+
+Sun Sep 01 2002 -
+	* Released hcfpcimodem-0.98mbsibeta02090100.
+	* Released hcfusbmodem-0.98mbsibeta02090100ppc.
+
+Sat Aug 31 2002 -
+	* imported/hcfengine.O: various workarounds.
+	* makefile: added Mandrake 2.4.18-8.1mdk kernel.
+	* modules/osspec/osservices.c: fixed more potential race conditions
+	and thread termination problems.
+	* modules/osspec/{osusb.c,include/oscompat.h}: applied 2.4.20-pre
+	compatibility patch from Benjamin Herrenschmidt.
+	* FAQ: updated.
+
+Sun Aug 25 2002 -
+	* makefile: added RedHat 2.4.18-10 kernel.
+	* modules/osspec/include/oscompat.h: added kernel stack checker.
+	* modules/osspec/osservices.c: mdmthrd startup/shutdown improvements.
+
+Wed Aug 21 2002 -
+	* imported/hcfengine.O: merged with latest code from Conexant.
+	* Integrated voice (AT+FCLASS=8) support.
+	* Added modules/kernelcompiler.sh, a small script which tries
+	to guess which compiler should be used to build kernel modules.
+	* modules/common.mak: use kernelcompiler.sh to determine default CC
+	* modules/common.mak, INSTALL: added notes about KERNELSRC for
+	Debian 3.0 users.
+	* modules/osspec/osnvm.c: NVM_Write() now returns COM_STATUS_SUCCESS
+	for unrecognized codes.
+
+Sun Jul 21 2002 -
+	* makefile: added RedHat 2.4.9-34 and 2.4.18-5 kernels.
+	* Updated BUGS file.
+
+Thu Jul 18 2002 -
+	* modules/serial_hcf.c: retry OsUsbGetInstance(0) if it fails.
+	* modules/osspec/osusb.c: removed OsSleep(250) after
+	pmac_call_feature(PMAC_FTR_MODEM_ENABLE, NULL, 0, 1);
+	(Thanks to Benjamin Herrenschmidt for both fixes)
+
+Fri Jul 05 2002 -
+	* Released hcfpcimodem-0.97mbsibeta02070500.
+
+Fri Jul 05 2002 -
+	* imported/hcfengine.O: merged with latest code from Conexant.
+	* Initial support for multiple machine architectures.
+	* modules/osspec/osservices.c: use cmpxchg() as OsAtomicCompareAndSwap()
+	if available.
+	* modules/osspec/osservices.c: implemented dedicated kernel thread,
+	replacing use of tq_scheduler and schedule_task(). This should address
+	problems under earlier 2.2 kernels.
+	* modules/osspec/osservices.c: if called in interrupt context,
+	OsSleep() now complains and aborts.
+	* modules/osspec/osnvm.c: do not generate carriage returns.
+	* scripts/hcfconfig.in: added crude big-endian inf file conversion hack,
+	and support for GNU awk invocation as gawk.
+
+Tue Jun 25 2002 -
+	* Released hcfpcimodem-0.96mbsibeta02062500.
+
+Tue Jun 25 2002 -
+	* Renamed PCI driver package to hcfpcimodem in preparation for release
+	of hcfusbmodem. Most pathnames and script prefixes also changed from
+	'hcf' to 'hcfpci'.
+	* Silenced HwHdlcWrite: .. HW_HDLC_NONE messages.
+	* modules/osspec/include/oscompat.h: get rid of non-standard min/max
+	* modules/common.mak: added -Wno-multichar to CFLAGS.
+	* inf/hcfv90_linux.inf: added PCI ID 158b:0015 for
+	Allied Data Technologies modem (Thanks to Dave Rodgman)
+
+Tue Jun 18 2002 -
+	* Released hcflinmodem-0.95mbsibeta02061800.
+
+Tue Jun 18 2002 -
+	* Eliminated unwanted debug messages.
+	* OSTermPowerManagement(): use pm_unregister() under 2.4,
+	pm_unregister_all() only once under 2.2.
+
+Mon Jun 17 2002 -
+	* Released hcflinmodem-0.95mbsibeta02061700.
+
+Sun Jun 16 2002 -
+	* imported/hcfengine.O: merged with latest code from Conexant.
+	* Added preliminary power-management support.
+	* More FAX/HDLC workarounds.
+	* modules/osspec/osservices.c: OsSleep() and timer code tweaking.
+
+Thu Jun 13 2002 -
+	* Released hcflinmodem-0.94mbsibeta02061300.
+
+Thu Jun 13 2002 -
+	* Implemented workarounds for HW HDLC problems affecting fax mode.
+	Class 1 FAX reception and transmission should now work.
+
+Tue Jun 11 2002 -
+	* Released hcflinmodem-0.93mbsibeta02061100.
+
+Tue Jun 11 2002 -
+	* Added RIPTIDE HCF modem support.
+	* inf/, scripts/hcfconfig.in: small restructuration; use hcf_linux.cty
+	as default cty file unless one corresponding to selected inf file exists.
+	* makefile, hcflinmodem.spec.in: don't include big pdf file in tar pkgs.
+
+Mon Jun 10 2002 -
+	* scripts/hcfconfig.in: choose_pcicomctrl() should also list
+	PCI serial controllers to catch older HCF modems.
+	* makefile, hcflinmodem.spec.in: better error propagation for RPM builds.
+
+Sun Jun 02 2002 -
+	* Released hcflinmodem-0.93mbsibeta02060200.
+
+Sun Jun 02 2002 -
+	* Restructured packaging once again to improve consistency with linux
+	distribution practices and further reduce space consumption.
+
+Sat Jun 01 2002 -
+	* Released hcflinmodem-0.93mbsibeta02060100.
+
+Sat Jun 01 2002 -
+	* modules/serial_hcf.c: hcf_tx_ready() should ignore hcf_evt_txempty
+	for now since atparser doesn't update STATUS_ATDTE_TX_CHAR for first
+	characters ('A', 'T') after +++.
+	* modules/osspec/osstdio.c: various enhancements to OsFOpen().
+
+Fri May 31 2002 -
+	* Removed extraneous prefixes from T.31 fax command responses.
+	* Added temporary workarounds to prevent crashes and freezes in fax mode,
+	which doesn't work yet but soon will.
+
+Tue May 28 2002 -
+	* modules/serial_core.c: replaced MINOR() with minor() for 2.5.x and
+	added missing spin_lock_init(&info->lock) to uart_get().
+	* modules/osspec/include/oscompat.h: ensure minor() is defined.
+
+Sun May 26 2002 -
+	* Released hcflinmodem-0.93mbsibeta02052600.
+
+Sun May 26 2002 -
+	* Restructured distribution-specific packaging to include
+	only needed kernel module binaries without unnecessary source.
+	This reduces package sizes and download times. Only the generic
+	packages now contain source code providing hcfconfig the ability
+	to re-link the kernel modules on-the-fly.
+	hcfconfig --auto is once again executed automatically during
+	installation of distribution-specific RPMs.
+	* Updated README, INSTALL and BUGS documentation files.
+	* modules/osspec/: minor cleanups
+
+Thu May 23 2002 -
+	* Released hcflinmodem-0.93mbsibeta02052300.
+
+Thu May 23 2002 -
+	* scripts/hcfconfig.in: remove old /dev/modem after configuring devfs.
+
+Tue May 21 2002 -
+	* Released hcflinmodem-0.93mbsibeta02052101.
+
+Tue May 21 2002 -
+	* modules/makefile: Added binary module support for SuSE 8.0 (2.4.18-4GB)
+
+Tue May 21 2002 -
+	* Released hcflinmodem-0.93mbsibeta02052100.
+
+Mon May 20 2002 -
+	* scripts/hcfconfig.in: Improved devfs configuration to hopefully solve
+	automatic module loading/device node visibility issues.
+	* modules/makefile: Added binary module support for RedHat 7.3
+	* modules/makefile, common.mak: implemented workaround for
+	obscure make bug causing compilation to fail with the error
+	"make: expand.c:489: allocated_variable_append:
+	Assertion `current_variable_set_list->next != 0' failed."
+	* inf/*.cty: use more generic relay parameters.
+
+Sun May 19 2002 -
+	* Released hcflinmodem-0.93mbsibeta02051900.
+
+Sat May 18 2002 -
+	* Added preliminary support for 127A:100x (71DP) devices.
+	* Added preliminary support for 14F1:1813 and 1815 LAN/Modem combo.
+	* Revamped and updated INF files.
+	* scripts/hcfconfig.in: proper ISO-3166 country map entries for
+	ARGENTINA, BRAZIL, CZECH_REPUBLIC, and NETHERLANDS.
+	* modules/osspec/osresour.c: rewrote OSGetPCIDeviceResources()
+	* modules/osspec/osnvm.c: added CALLERID2, CALLWAITING_PARMS, V92_CONTROL,
+	FLAGS2, CW, PIG, and MOH.
+
+Mon May 06 2002 -
+	* Released hcflinmodem-0.92mbsibeta02050600.
+
+Mon May 06 2002 -
+	* scripts/hcfconfig.in: check_unsupported(): some 127a:102x devices
+	actually work.
+	* modules/osspec/include/oscompat.h: fixed memcpy issue for 2.2 users.
+
+Sun May 05 2002 -
+	* Released hcflinmodem-0.92mbsibeta02050500.
+
+Sun May 05 2002 -
+	* Changed ttyHCF0 device name to ttySHCF0 for compatibility with wvdial.
+
+Fri Apr 26 2002 -
+	* modules/osspec/include/osuniqredef.h: added to solve name collision
+	problem with HSF and other modules.
+
+Fri Apr 26 2002 -
+	* scripts/hcfconfig.in: added OSKERNTYPE, which is set to the type
+	of kernel installed, not the architecture.
+	* modules/makefile: add i386 to REDHAT_MACHINES to accomodate people
+	still running i386 kernels and link-identical-binaries to save space..
+
+Wed Apr 25 2002 -
+	* Released hcflinmodem-0.91mbsibeta02042500.
+
+Wed Apr 24 2002 -
+	* imported/hcfengine.O: merged in new Conexant modem code, added
+	SmartDAA support.
+	* scripts/hcfconfig.in: remove SmartDAA devices from check_unsupported().
+	* inf/: reorganized inf files, removed unnecessary sections,
+	added SmartDAA versions.
+	* modules/serial_hcf.c: handle new-style COMCTRL_EVT_RINGS events.
+
+Mon Apr 22 2002 -
+	* scripts/hcfconfig.in: re-enabled creation of /dev/modem symlink
+	* Released hcflinmodem-0.9mbsibeta02042201.
+
+Mon Apr 22 2002 -
+	* Released hcflinmodem-0.9mbsibeta02042200.
+
+Sun Apr 21 2002 -
+	* modules/serial_hcf.c: Added /proc/driver/hcf/0/lastcallstatus and
+	loglastcallstatus parameter, which when set to a non-zero value will
+	make the driver automatically log the last call status (AT#UG) info.
+	* modules/osspec/osnvm.c: Use AT&D2 by default.
+	* imported/hcfengine.O: silenced various debug messages confusing users.
+	* scripts/hcfconfig.in: added check_unsupported(), workaround for
+	bash's limited printf builtin and other small usability improvements.
+	* modules/common.mak: changed default KERNELSRC to match hcfconfig.
+
+Sat Apr 20 2002 -
+	* modules/osspec/osstdio.c: if f_op->llseek is NULL, call default_llseek.
+	(Thanks to Gratiniano S. de Haro for reporting this problem)
+	* scripts/hcfconfig.in: cut down size of default --dumpdiag output.
+
+Wed Apr 13 2002 -
+	* Released hcflinmodem-0.9mbsibeta02041300.
+
+Wed Apr 12 2002 -
+	* modules/makefile: revamped directory structure for binaries and added
+	several mandrake kernels.
+	* makefile: add missing bracket to RPMTOPDIRDEFINED test.
+	* scripts/hcfconfig.in: create /lib/modules/.../misc directory if it
+	doesn't exist and add build kernel-source check.
+	* scripts/hcfconfig.in: really fix broken pipe messages in get_inf_section
+
+Wed Apr 05 2002 -
+	* Released hcflinmodem-0.9mbsibeta02040500.
+
+Wed Apr 03 2002 -
+	* Released hcflinmodem-0.9mbsibeta02040300.
+
+Wed Apr 03 2002 -
+	* scripts/hcfconfig.in: add check for binary modules with OSKERNVERS_NODASH.
+	* modules/osspec/osservices.c: OsSleep() workaround to prevent crashes
+	on < 2.2.20 kernels.
+
+Tue Mar 26 2002 -
+	* hcflinmodem.spec.in, makefile: add distribution-specific
+	packages containing module binaries for default kernels.
+
+	* modules/common.mak: add DISTRO_CFLAGS
+
+	* modules/makefile: add rules to build binaries for mainstream
+	distributions.
+
+Sun Mar 24 2002 -
+	* Released hcflinmodem-0.9mbsibeta02032400.
+
+Sun Mar 24 2002 -
+	* modules/osspec/osnvm.c: Added check for OsFOpen() return value.
+	* Improved test for awk strtonum() workaround.
+	(Thanks to Gratiniano S. de Haro)
+
+Fri Mar 08 2002 -
+	* Released hcflinmodem-0.9mbsibeta02030801.
+
+Fri Mar 08 2002 -
+	* scripts/hcfconfig.in: workaround for awks that don't support strtonum().
+
+Fri Mar 08 2002 -
+	* Released hcflinmodem-0.9mbsibeta02030800.
+
+Fri Mar 08 2002 -
+	* hcflinmodem.spec.in: only run hcfconfig --auto in %post if
+	HCF_AUTOCONFIG env variable is set, so as to match INSTALL documentation.
+	* modules/serial_hcf.c: PCI vendor and device IDs of HCF modem can be
+	explicitely passed as modules parameters named pcivendorid and pcideviceid.
+	* T__ERROR messages always printk()ed when USE_TRACE_ONLY_ERRORS defined.
+	* /devicemanager/asiclib.c: fixed crash upon SysCreateDevResources()
+	failure due to AsicDisableHWEvent() being called.
+	* modules/osspec/osservices.c: OsSleep() should call schedule_timeout()
+	or mdelay(), not udelay().
+
+Tue Mar 05 2002 -
+	* Released hcflinmodem-0.9mbsibeta02030500.
+
+Tue Mar 05 2002 -
+	* Added "Conflicts: hsflinmodem" to RPM spec file as a temporary
+	measure until the symbol name collisions are fixed.
+	* scripts/hcfconfig.in: get_inf_section(): redirect stderr to /dev/null
+	for the preprocess_inf() call to ignore broken pipe errors.
+
+Fri Mar 01 2002 -
+	* Initial beta version (hcflinmodem-0.9mbsibeta02030100).

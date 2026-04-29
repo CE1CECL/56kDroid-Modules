@@ -1,0 +1,11 @@
+- Fax and Voice support (PCI version only) are still preliminary and have
+not yet been sufficiently tested. Voice is limited to V.92 modems (73DP)
+for now.
+
+Missing features that might be implemented one day:
+
+- Modem On Hold (for V.92)
+
+Not supported:
+
+- First-generation (Cadmus1-based) USB HCF modems. See FAQ for details

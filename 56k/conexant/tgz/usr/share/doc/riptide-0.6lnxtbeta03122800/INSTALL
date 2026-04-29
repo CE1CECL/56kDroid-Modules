@@ -1,0 +1,99 @@
+Please see the README file for general information.
+
+BEFORE INSTALLING
+
+Remove any old RIPTIDE drivers, either manually or by
+running "rpm -e riptide" or "make uninstall" if using the
+RPM or tar versions of this package respectively.
+
+
+INSTALLATION INSTRUCTIONS
+
+If your Linux distribution supports the RPM Package Manager,
+and has a recent libc, it is easiest to install the binary RPM package
+with METHOD A. METHOD B is for distributions without RPM support, or those
+who prefer not to use RPM.
+
+
+METHOD A: BINARY RPM PACKAGE (*.{arch}.rpm)
+
+If you have obtained the driver package in RPM format:
+
+1. install the rpm with "rpm -i riptide-{version}.{arch}.rpm"
+
+2. optionally re-run "ripconfig" to complete the installation (if necessary).
+
+If you need to rebuild the binary RPM from source, you
+can get the TAR package and run: "rpmbuild -tb riptide-{version}.tar.gz"
+(if rpmbuild is not found, you might have to install the rpm-build
+package or if you have an older RPM version, try "rpm --rebuild ...")
+
+
+METHOD B: TAR PACKAGE (*.tar.gz)
+
+If you have obtained the driver package in tar format:
+
+1. extract the package with "tar -xzf riptide-{version}.tar.gz"
+
+2. change to the package directory with "cd riptide-{version}"
+
+3. run "make install" from the top of the package directory.
+
+4. run "ripconfig" to complete the installation and configure your board.
+
+(Alternatively to this whole procedure you may generate RPMS from the tar
+package using rpm -ta riptide-{version}.tar.gz")
+
+
+AFTER INSTALLATION
+
+If an error occurred during installation, please see the sections 'BUGS'
+and 'REPORTING PROBLEMS' below.
+
+Once the drivers are installed and configured, you should check the
+entries in /etc/modules.conf to ensure that no other conflicting
+"sound" alias or audio/dsp/midi configuration exists.
+
+The "ripconfig" command can be used to recompile (generic packages only)
+the kernel modules after installation.  Run "ripconfig --help" for
+usage information.
+
+
+MANUALLY UNLOADING THE DRIVERS
+
+The RIPTIDE drivers can be manually unloaded using the "ripstop" command.
+
+
+REMOVING THE DRIVER
+
+If for any reason you wish to un-install the RIPTIDE drivers from your
+system, the proper way to proceed depends on how they were initially
+installed.
+
+If you used an RPM installation method, execute "rpm -e riptide"
+to remove the package. If you used the tar method, change your current
+directory to where you extracted the archive, and execute "make uninstall"
+
+
+MORE INFORMATION AND HELP
+
+If you require assistance or need more information, go to:
+              http://www.linuxant.com
+
+Conexant Systems neither distributes nor maintains this package.
+PLEASE DO NOT CONTACT CONEXANT REGARDING THIS SOFTWARE!!!
+
+
+BUGS
+
+A list of currently known problems is included in the file "BUGS".
+
+
+REPORTING PROBLEMS
+
+Additional problem reports or patches may be sent to:
+	riptide-bugs@linuxant.com
+
+Enclosing the output of "ripconfig --dumpdiag" in your report can greatly
+facilitate problem resolution.
+

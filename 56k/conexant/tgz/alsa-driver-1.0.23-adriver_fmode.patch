@@ -1,0 +1,60 @@
+diff -urN --show-c-function alsa-driver-git20100411/configure.in alsa-driver-git20100411-adriver_fmode/configure.in
+--- alsa-driver-git20100411/configure.in	2010-04-11 13:41:26.000000000 -0400
++++ alsa-driver-git20100411-adriver_fmode/configure.in	2010-04-18 17:12:49.000000000 -0400
+@@ -2029,6 +2029,35 @@ if test "$CONFIG_HAVE_PCI_DEV_PRESENT" =
+   AC_DEFINE(CONFIG_HAVE_PCI_DEV_PRESENT)
+ fi
+ 
++dnl Check for fmode_t
++AC_MSG_CHECKING(for fmode_t)
++fmode_t_defined="0"
++ac_save_CFLAGS="$CFLAGS"
++ac_save_CC="$CC"
++CFLAGS="$KERNEL_CHECK_CFLAGS"
++CC=$KCC
++AC_TRY_COMPILE([
++#define __KERNEL__
++#ifdef CONFIG_HAVE_DEPRECATED_CONFIG_H
++#include <linux/autoconf.h>
++#else
++#include <linux/config.h>
++#endif
++#include <linux/types.h>
++],[
++	fmode_t foo;
++],
++    AC_MSG_RESULT(yes);fmode_t_defined="1",
++    AC_MSG_RESULT(no);fmode_t_defined="0",
++    AC_MSG_RESULT(unknown);fmode_t_defined="0"
++)
++CFLAGS=$ac_save_CFLAGS
++CC=$ac_save_CC
++CONFIG_HAVE_FMODE_T=$fmode_t_defined
++if test "$CONFIG_HAVE_FMODE_T" = "1"; then
++  AC_DEFINE(CONFIG_HAVE_FMODE_T)
++fi
++
+ dnl Check for msleep
+ AC_MSG_CHECKING(for msleep)
+ msleep="0"
+diff -urN --show-c-function alsa-driver-git20100411/include/adriver.h alsa-driver-git20100411-adriver_fmode/include/adriver.h
+--- alsa-driver-git20100411/include/adriver.h	2010-04-11 13:41:26.000000000 -0400
++++ alsa-driver-git20100411-adriver_fmode/include/adriver.h	2010-04-18 17:13:48.000000000 -0400
+@@ -109,7 +109,7 @@ typedef __u32 __be32;
+ 
+ /* other missing types */
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 28)
+-#if !defined(RHEL_RELEASE_CODE) || RHEL_RELEASE_CODE < RHEL_RELEASE_VERSION(5, 4)
++#ifndef CONFIG_HAVE_FMODE_T
+ typedef unsigned int fmode_t;
+ #endif
+ #endif
+diff -urN --show-c-function alsa-driver-git20100411/include/config.h.in alsa-driver-git20100411-adriver_fmode/include/config.h.in
+--- alsa-driver-git20100411/include/config.h.in	2010-04-11 13:41:26.000000000 -0400
++++ alsa-driver-git20100411-adriver_fmode/include/config.h.in	2010-04-18 17:15:14.000000000 -0400
+@@ -88,4 +88,5 @@
+ #undef CONFIG_HAVE_GFP_DMA32
+ #undef CONFIG_HAVE_PAGE_TO_PFN
+ #undef CONFIG_HAVE_VIDEO_DRVDATA
++#undef CONFIG_HAVE_FMODE_T
+ #undef CONFIG_HAVE_GENERATED_AUTOCONF_H

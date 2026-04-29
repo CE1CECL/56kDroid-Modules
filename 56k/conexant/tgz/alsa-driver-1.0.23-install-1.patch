@@ -1,0 +1,682 @@
+diff -urN alsa-driver-1.0.23/Makefile alsa-driver-1.0.23-install/Makefile
+--- alsa-driver-1.0.23/Makefile	2010-04-16 07:11:04.000000000 -0400
++++ alsa-driver-1.0.23-install/Makefile	2010-05-08 15:49:01.000000000 -0400
+@@ -106,8 +106,6 @@
+ endif
+ CSUBDIRS += test utils
+ 
+-KCONFIG_FILES = $(shell find $(SND_TOPDIR) -name Kconfig) $(shell find $(SND_TOPDIR)/alsa-kernel/ -name Kconfig)
+-
+ .PHONY: all
+ all: compile
+ 
+@@ -143,6 +141,9 @@
+ utils/mod-deps: utils/mod-deps.c
+ 	gcc utils/mod-deps.c -o utils/mod-deps
+ 
++ifeq ($(PREBUILT_DIR),)
++KCONFIG_FILES = $(shell find $(SND_TOPDIR) -name Kconfig) $(shell find $(SND_TOPDIR)/alsa-kernel/ -name Kconfig)
++
+ toplevel.config.in: $(KCONFIG_FILES) $(ALSAKERNELFILE) utils/mod-deps kconfig-vers
+ 	utils/mod-deps --basedir $(SND_TOPDIR)/alsa-kernel --hiddendir $(SND_TOPDIR) --versiondep $(SND_TOPDIR)/kconfig-vers --makeconf > toplevel.config.in
+ 
+@@ -151,14 +152,18 @@
+ 
+ include/config1.h.in: $(KCONFIG_FILES) $(ALSAKERNELFILE) utils/mod-deps kconfig-vers
+ 	utils/mod-deps --basedir $(SND_TOPDIR)/alsa-kernel --hiddendir $(SND_TOPDIR) --versiondep $(SND_TOPDIR)/kconfig-vers --include > include/config1.h.in
++endif
+ 
+ all-deps: toplevel.config.in acinclude.m4 include/config1.h.in
+ 
+ include/sndversions.h:
+ 	$(MAKE) dep
+ 
++include/sound/version.h:
++	(cd include/sound && ln -s ../../alsa-kernel/include/*.h .)
++
+ .PHONY: compile
+-compile: include/sndversions.h
++compile: include/sound/version.h include/sndversions.h
+ ifdef NEW_KBUILD
+ 	$(MAKE) -C $(CONFIG_SND_KERNELDIR) SUBDIRS=$(MAINSRCDIR) $(MAKE_ADDS) CPP="$(CPP)" CC="$(CC)" modules
+ 	utils/link-modules $(SND_TOPDIR)
+@@ -172,7 +177,7 @@
+ .PHONY: dep
+ dep:
+ ifdef NEW_KBUILD
+-	@for d in $(SUBDIRS); do if ! $(MAKE) -C $$d prepare; then exit 1; fi; done
++	#@for d in $(SUBDIRS); do if ! $(MAKE) -C $$d prepare; then exit 1; fi; done
+ else
+ 	@for d in $(SUBDIRS); do if ! $(MAKE) -C $$d fastdep; then exit 1; fi; done
+ endif
+@@ -182,27 +187,77 @@
+ 	awk "{ if ( length( $$1 ) != 0 ) print $$1 }" snd.map | sort -o snd.map1
+ 	mv -f snd.map1 snd.map
+ 
++SND_MODULES := $(shell cd /lib/modules/`uname -r` && find . -name "snd*.*o" -type f -print)
++SND_INCLUDE := $(shell for build in build source; do if [ -d /lib/modules/`uname -r`/$${build}/include/sound ]; then echo $${build}/include/sound; exit 0; fi; done)
++
++.PHONY: backup
++backup:
++ifeq ($(shell test -e "/lib/modules/`uname -r`/alsa-backup.tar" || echo yes), yes)
++	@( cd "/lib/modules/`uname -r`"; \
++	FILES=; \
++	for f in build/Module.symvers build/include/linux/autoconf.h; do \
++		if [ -r "$${f}" ]; then \
++			FILES="$${FILES} $${f}"; \
++		fi; \
++	done; \
++	tar -cf alsa-backup.tar $${FILES} $(SND_INCLUDE) $(SND_MODULES) && \
++	rm -fr $(SND_INCLUDE) $(SND_MODULES))
++endif
++
+ .PHONY: install
+-install: install-headers install-modules install-scripts check-snd-prefix
++install: install-scripts install-rcscripts
++
++.PHONY: install-kernel
++install-kernel: backup install-headers install-modules check-snd-prefix
+ 	@if [ -L /dev/snd ]; then \
+ 		echo "The ALSA devices were removed from /proc/asound/dev directory." ; \
+ 		echo "Creating static device entries in /dev/snd." ; \
+ 		$(SND_TOPDIR)/snddevices ; \
+ 	fi
++ifeq ($(PREBUILT_DIR),)
++ifeq ($(DESTDIR),)
++	@echo
++	@echo "If you want to build 3rd party kernel modules which are related to ALSA,"
++	@echo "please reboot your system now or reload all snd-* kernel modules."
++	@echo
++endif
+ 	cat WARNING
++endif
+ 
+ .PHONY: install-headers
+ install-headers:
+-	if [ -L $(DESTDIR)$(prefix)/include/sound ]; then \
+-		rm -f $(DESTDIR)$(prefix)/include/sound; \
+-		ln -sf $(MAINSRCDIR)/include/sound $(DESTDIR)$(prefix)/include/sound; \
++ifeq ($(DESTDIR),)
++	if [ -L $(CONFIG_SND_KERNELDIR)/include/sound ]; then \
++		rm -f $(CONFIG_SND_KERNELDIR)/include/sound; \
++		ln -sf $(MAINSRCDIR)/include/sound $(CONFIG_SND_KERNELDIR)/include/sound; \
+ 	else \
+-		rm -rf $(DESTDIR)$(prefix)/include/sound; \
+-		install -d -m 755 -g $(IGROUP) -o $(IUSER) $(DESTDIR)$(prefix)/include/sound; \
++		rm -rf $(CONFIG_SND_KERNELDIR)/include/sound; \
++		install -d -m 755 -g $(IGROUP) -o $(IUSER) $(CONFIG_SND_KERNELDIR)/include/sound; \
+ 		for f in include/sound/*.h; do \
+-			install -m 644 -g $(IGROUP) -o $(IUSER) $$f $(DESTDIR)$(prefix)/include/sound; \
++			install -m 644 -g $(IGROUP) -o $(IUSER) $$f $(CONFIG_SND_KERNELDIR)/include/sound; \
+ 		done \
++	fi; \
++	if [ -e "$(CONFIG_SND_KERNELDIR)/Module.symvers" ]; then \
++		if [ -n "$(PREBUILT_DIR)" ]; then \
++			SYMVERS="$(PREBUILT_DIR)/config/Module.symvers"; \
++		else \
++			SYMVERS="Module.symvers"; \
++		fi; \
++		if [ -e "$${SYMVERS}" ]; then \
++			./symvers-update "$(CONFIG_SND_KERNELDIR)/Module.symvers" $${SYMVERS}; \
++		fi; \
++	fi; \
++	if [ -e "$(CONFIG_SND_KERNELDIR)/include/linux/autoconf.h" ]; then \
++		if [ -n "$(PREBUILT_DIR)" ]; then \
++			AUTOCONF="$(PREBUILT_DIR)/config/autoconf.h"; \
++		else \
++			AUTOCONF="include/linux/autoconf.h"; \
++		fi; \
++		if [ -e "$${AUTOCONF}" ]; then \
++			cp -p "$${AUTOCONF}" "$(CONFIG_SND_KERNELDIR)/include/linux/autoconf.h"; \
++		fi; \
+ 	fi
++endif
+ 
+ ifeq ($(CONFIG_SND_KERNELDIR)/System.map,$(wildcard $(CONFIG_SND_KERNELDIR)/System.map))
+ SYSTEM_MAP_OPT = -F $(CONFIG_SND_KERNELDIR)/System.map
+@@ -210,6 +265,7 @@
+ 
+ .PHONY: install-modules
+ install-modules:
++ifeq ($(PREBUILT_DIR),)
+ ifeq ($(moddir_tree),y)
+ 	find $(DESTDIR)$(moddir) -name 'snd*.*o' | xargs rm -f
+ 	find $(DESTDIR)$(moddir) -name 'snd*.*o.gz' | xargs rm -f
+@@ -219,9 +275,23 @@
+ 	rm -f $(DESTDIR)$(moddir)/snd*.*o $(DESTDIR)$(moddir)/persist.o $(DESTDIR)$(moddir)/isapnp.o
+ 	rm -f $(DESTDIR)$(moddir)/snd*.*o.gz $(DESTDIR)$(moddir)/persist.o.gz $(DESTDIR)$(moddir)/isapnp.o.gz
+ endif
+-	@for d in $(SUBDIRS); do if ! $(MAKE) -C $$d modules_install; then exit 1; fi; done
++else
++	find /lib/modules/`uname -r` -name 'snd*.*o' | xargs rm -f
++	find /lib/modules/`uname -r` -name 'snd*.*o.gz' | xargs rm -f
++	find /lib/modules/`uname -r` -name 'ac97_bus.*o' | xargs rm -f
++	find /lib/modules/`uname -r` -name 'ac97_bus.*o.gz' | xargs rm -f
++endif
++
++	@if [ -n "$(PREBUILT_DIR)" ]; then \
++		TARGET="/lib/modules/`uname -r`/kernel/sound"; \
++		mkdir -p "$${TARGET}"; \
++		cp -pr $(PREBUILT_DIR)/modules/* "$${TARGET}"; \
++		depmod; \
++	else \
++		for d in $(SUBDIRS); do if ! $(MAKE) -C $$d modules_install; then exit 1; fi; done; \
++	fi
+ ifeq ($(DESTDIR),)
+-	-/sbin/depmod -a $(kaversion) $(SYSTEM_MAP_OPT)
++	-/usr/sbin/reload-alsa-driver
+ else
+ 	@echo "*** This is a \`staged' install using the prefix"
+ 	@echo "***	\"$(DESTDIR)\"."
+@@ -235,6 +305,12 @@
+ 
+ .PHONY: install-scripts
+ install-scripts:
++	mkdir -p $(DESTDIR)/usr/sbin
++	install -m 755 reload-alsa-driver $(DESTDIR)/usr/sbin
++
++.PHONY: install-rcscripts
++install-rcscripts:
++	mkdir -p $(DESTDIR)/etc/init.d
+ 	@for d in /sbin/init.d /etc/rc.d/init.d /etc/init.d; do \
+ 	 if [ -d $(DESTDIR)$$d ]; then \
+ 	   if [ -f $(DESTDIR)$$d/alsasound ]; then \
+@@ -278,8 +354,8 @@
+ 
+ .PHONY: mrproper
+ mrproper: clean1
+-	@for d in $(SUBDIRS); do if ! $(MAKE) -C $$d mrproper; then exit 1; fi; done
+-	@for d in $(CSUBDIRS); do if ! $(MAKE) -C $$d mrproper; then exit 1; fi; done
++	@if [ -e Makefile.conf ]; then for d in $(SUBDIRS); do if [ -e "$$d/Makefile" ]; then if ! $(MAKE) -C $$d mrproper; then exit 1; fi; fi; done; fi
++	@if [ -e Makefile.conf ]; then for d in $(CSUBDIRS); do if [ -e "$$d/Makefile" ]; then if ! $(MAKE) -C $$d mrproper; then exit 1; fi; fi; done; fi
+ 	rm -f *~ out.txt *.orig *.rej .#* .gdb_history
+ 	rm -f doc/*~
+ 	-rm -f config.cache config.log config.status Makefile.conf
+@@ -289,7 +365,15 @@
+ 	rm -f `find alsa-kernel -name "*.rej"`
+ 	rm -f `find alsa-kernel -name ".#*"`
+ 	rm -f `find alsa-kernel -name "out.txt"`
++	rm -f `find . -name "Module.markers"`
++	rm -f `find . -name "modules.order"`
+ 	rm -rf autom4te.cache
++	echo skipping rm -f alsa-kernel/include/version.h
++	rm -fr .tmp_versions
++	rm -f Module.symvers
++	find include/sound -name "*.h" -type l | xargs rm -f
++	rm -fr include/generated
++  
+ 
+ .PHONY: cvsclean hgclean gitclean
+ gitclean: mrproper
+@@ -300,6 +384,11 @@
+ hgclean: gitclean
+ cvsclean: gitclean
+ 
++.PHONY: mrextraproper
++mrextraproper: mrproper
++	find . -name "*.in" -a ! -name "configure.in" | sed 's/.in$$//g' | xargs rm -f
++	rm -fr builds
++
+ .PHONY: pack
+ pack: $(ALSAKERNELFILE) mrproper
+ 	chmod 755 utils/alsasound
+@@ -318,7 +407,7 @@
+ 	}
+ 
+ .PHONY: uninstall
+-uninstall:
++uninstall: mrproper
+ 	-rm -rf $(DESTDIR)$(prefix)/include/sound
+ ifeq ($(moddir_tree),y)
+ 	{ \
+@@ -332,10 +421,103 @@
+ 	rm -f $(DESTDIR)/sbin/init.d/alsasound
+ 	rm -f $(DESTDIR)/etc/rc.d/init.d/alsasound
+ 	rm -f $(DESTDIR)/etc/init.d/alsasound
++	@unamer="`uname -r`" ; \
++	for backup in /lib/modules/*/alsa-backup.tar; do \
++		if [ -r "$${backup}" ]; then \
++			dir="`dirname $${backup}`" ; \
++			kver="`basename $${dir}`" ; \
++			cd "$${dir}" && \
++			rm -fr build/Module.symvers build/include/sound && \
++			tar -xf "`basename $${backup}`" && \
++			rm -f  "`basename $${backup}`" ; \
++			if [ "$${kver}" != "$${unamer}" ]; then \
++				depmod $${kver} ; \
++			fi ; \
++		fi ; \
++	done
++	-/usr/sbin/reload-alsa-driver
+ 
+ .PHONY: TAGS
+ TAGS:
+ 	find . -name '*.[ch]' | etags -
+ 
++RPMTOPDIR := $(shell pwd)/builds
++KVERSION := $(shell uname -r)
++KVERSION_UNDERSCORE := $(subst -,_,$(KVERSION))
++PACKARCH := $(shell uname -m | sed -e 's/i.86/i386/g' -e 's/x86_64/amd64/g')
++KBUILD := /lib/modules/$(KVERSION)/build
++KARCH := $(shell rpm --eval '%{_target_cpu}' 2>/dev/null)
++
++RPMDIRS=$(patsubst %, $(RPMTOPDIR)/%, BUILD RPMS SPECS SRPMS SOURCES)
++
++DEBDIRS="builds/DEB"
++
++$(RPMDIRS) $(DEBDIRS):
++	mkdir -p $@
++
++.PHONY: tardist
++tardist: mrextraproper
++	@cd ..; \
++	tar -cjf alsa-driver-linuxant.tar.bz2 alsa-driver-linuxant
++
++.PHONY: check-rpmprecomp-packages
++check-rpmprecomp-packages:
++	@if ! which rpmbuild > /dev/null 2>&1; then echo 1>&2 "ERROR: Missing package: rpm-build. Please install it and try again."; exit 1; fi; exit 0
++
++.PHONY: rpmprecomp
++rpmprecomp: check-rpmprecomp-packages tardist $(RPMDIRS)
++	mv ../alsa-driver-linuxant.tar.bz2 builds/SOURCES
++	cp -p alsa-driver-linuxant.spec builds/SPECS
++	rpmbuild -bb --target=$(KARCH) --define="_topdir $(RPMTOPDIR)" --define="kversion $(KVERSION)" --define="kversion_underscore $(KVERSION_UNDERSCORE)" --define="kbuild $(KBUILD)" --define="rel 1$(RELEASE)" builds/SPECS/alsa-driver-linuxant.spec
++
++KVERSION_DASH := $(subst _,-,$(KVERSION))
++
++.PHONY: unpack_debbuild
++unpack_debbuild:
++	mv ../alsa-driver-linuxant.tar.bz2 builds/DEB
++	@cd builds/DEB && tar -xjf alsa-driver-linuxant.tar.bz2
++	@for f in builds/DEB/alsa-driver-linuxant/debian/*.in; do \
++		target="builds/DEB/alsa-driver-linuxant/debian/`basename $${f} .in`"; \
++		sed -e "s/@KVERSION@/$(KVERSION)/g" \
++		    -e "s!@KBUILD@!$(KBUILD)!g" \
++		    -e "s!@DATE@!`date \"+%a, %d %b %Y %T %z\"`!g" \
++		    -e "s/@KPACKAGE_VERSION@/-k$(KVERSION_DASH)-1/g" \
++		    -e "s/@ARCH@/$(PACKARCH)/g" \
++		    -e "s/@SOURCE@/alsa-driver-linuxant/g" \
++		    < "$${f}" > "$${target}"; \
++		chmod --reference=$${f} "$${target}"; \
++	done
++
++.PHONY: check-debprecomp-packages
++check-debprecomp-packages:
++	@REQ=; \
++	if [ ! -e "/usr/share/build-essential/essential-packages-list" ]; then \
++		REQ="build-essential"; \
++	fi; \
++	if ! which dpkg-buildpackage > /dev/null 2>&1; then \
++		if [ -n "$${REQ}" ]; then \
++			REQ="$${REQ} dpkg-dev"; \
++		else \
++			REQ="dpkg-dev"; \
++		fi; \
++	fi; \
++	if ! which dh_md5sums > /dev/null 2>&1; then \
++		if [ -n "$${REQ}" ]; then \
++			REQ="$${REQ} debhelper"; \
++		else \
++			REQ="debhelper"; \
++		fi; \
++	fi; \
++	if [ -n "$${REQ}" ]; then \
++		echo 1>&2 "ERROR: Missing package(s): $${REQ}. Please install them and try again."; \
++		exit 1; \
++	fi; \
++	exit 0
++	
++
++.PHONY: debprecomp
++debprecomp: check-debprecomp-packages tardist $(DEBDIRS) unpack_debbuild $(DEBFILES)
++	@(cd builds/DEB/alsa-driver-linuxant && dpkg-buildpackage -us -uc) && echo && echo "`ls builds/DEB/*.deb` was successfully built."
++
+ endif # call from 2.6 kernel build system
+ 
+diff -urN alsa-driver-1.0.23/reload-alsa-driver alsa-driver-1.0.23-install/reload-alsa-driver
+--- alsa-driver-1.0.23/reload-alsa-driver	1969-12-31 19:00:00.000000000 -0500
++++ alsa-driver-1.0.23-install/reload-alsa-driver	2010-05-08 15:49:59.000000000 -0400
+@@ -0,0 +1,187 @@
++#!/bin/sh
++#
++# Reloads all ALSA modules on the system, killing all applications which is
++# using the sound if necessary. This script is expected to be run after the
++# new kernel modules are installed and before depmod is ran (depmod will be
++# done by this script)
++#
++
++run_command()
++{
++	if ${do_debug}; then
++		echo "+ Running $@"
++	fi
++
++	eval $@
++
++	ret=$?
++
++	if ${do_debug} && [ ${ret} -ne 0 ]; then
++		echo "+ Returned ${ret}"
++	fi
++
++	return ${ret}
++}
++
++kill_procs()
++{
++	method=$1
++	majors=$2
++
++	perl - << EOF
++	my @tokill;
++
++	foreach (glob "/proc/[123456789]*") {
++		my \$pid = \$_;
++		foreach (glob \$pid . "/fd/*") {
++			my \$major = (stat)[6];
++			if (defined(\$major)) {
++				\$major >>= 8;
++				foreach \$match (qw/ ${majors} /) {
++					if (\$major == \$match) {
++						\$pid =~ s!^/proc/!!;
++						push(@tokill, int(\$pid));
++					}
++				}
++			}
++		}
++	}
++
++	if(@tokill) {
++		print "Sending ${method} signal to processes still using sound:\n";
++		system("ps -o pid,user,args -wp" . join(",", map sprintf("%d", \$_), @tokill));
++		kill ${method}, @tokill;
++	}
++EOF
++
++	return 0
++}
++
++unload_mods()
++{
++	FAILEDMODS=
++	failedret=0
++
++	for mod in $@; do
++		if ${do_debug}; then
++			run_command modprobe -r $mod
++		else
++			run_command modprobe -r $mod > /dev/null 2>&1
++		fi
++		ret=$?
++		if [ ${ret} -ne 0 ]; then
++			FAILEDMODS="$mod $FAILEDMODS"
++			failedret=${ret}
++		fi
++	done
++
++	if [ ${failedret} -ne 0 ]; then
++		ret=${failedret}
++	fi
++
++	return $ret
++}
++
++
++
++PATH=/usr/sbin:/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
++export PATH
++
++do_only_unload=false
++do_help=false
++do_debug=false
++
++for arg in $@; do
++	case "${arg}" in
++		-h|--help)
++			do_help=true
++			;;
++		-u)
++			do_only_unload=true
++			;;
++		-d|--debug)
++			do_debug=true
++			;;
++		*)
++			echo 2>&1 "$0: Unknown option \"${arg}\". Try \"$0 -h\" for more information."
++			exit 1
++			;;
++	esac
++done
++
++if ${do_help}; then
++	echo "Usage: $0 [ -h | --help] [-u] [-d]"
++	echo "Unload all sound modules from the kernel and reload them"
++	echo
++	echo "  -h, --help    Display this help and exit"
++	echo "  -u            Only unload sound modules, don't reload them"
++	echo "  -d, --debug   Display debugging information"
++
++	exit 0
++fi
++
++# Determine all ALSA modules that are loaded at the moment
++TOPLEVEL="`lsmod | awk '$0 ~ /^snd[-_]/ && $4 == "" { print $1 }'`"
++
++if [ -z "${TOPLEVEL}" ]; then
++	depmod
++	exit 0
++fi
++
++if ! unload_mods ${TOPLEVEL}; then
++	# At least one module failed to be unloaded, we assume that there is a process
++	# which is using ALSA at the moment, we will try to terminate this or these
++	# applications
++
++	maj="`awk '$2 ~ "alsa|sound" { print $1 }' /proc/devices`"
++
++	if [ -n "${maj}" ]; then
++		# Be gentle at first
++		kill_procs TERM "${maj}"
++		
++		for wait in 1 7 7; do
++			sleep ${wait}
++			unload_mods ${FAILEDMODS}
++			ret=$?
++			if [ ${ret} -eq 0 ]; then
++				break
++			fi
++		done
++
++		if [ ${ret} -ne 0 ]; then
++			# Last resort...
++			kill_procs KILL "${maj}"
++
++			for wait in 1 5; do
++				sleep ${wait}
++				unload_mods ${FAILEDMODS}
++				ret=$?
++				if [ ${ret} -eq 0 ]; then
++					break
++				fi
++			done
++		fi
++
++		if [ ${ret} -ne 0 ]; then
++			echo 2>&1 "ERROR: Can't unload ALSA modules from the kernel. Please reboot."
++			depmod
++			exit ${ret}
++		fi
++	else
++		echo 2>&1 "ERROR: Can't determine ALSA and OSS major device numbers. Please reboot."
++		depmod
++		exit 1
++	fi
++fi
++
++depmod
++
++if ! ${do_only_unload}; then
++	# Reload all modules we have removed from the kernel
++	for mod in ${TOPLEVEL}; do
++		run_command modprobe $mod
++	done
++fi
++
++exit 0
++
+diff -urN alsa-driver-1.0.23/Rules.make alsa-driver-1.0.23-install/Rules.make
+--- alsa-driver-1.0.23/Rules.make	2010-04-16 07:11:04.000000000 -0400
++++ alsa-driver-1.0.23-install/Rules.make	2010-05-08 15:49:01.000000000 -0400
+@@ -16,7 +16,7 @@
+ # apply patches beforehand
+ .PHONY: cleanup
+ cleanup:
+-	rm -f *.[oas] *.ko .*.cmd .*.d .*.tmp *.mod.c $(clean-files)
++	rm -f *.[oas] *.ko .*.cmd .*.d .*.tmp *.mod.c
+ 	@for d in $(patsubst %/,%,$(filter %/, $(obj-y))) \
+ 	          $(patsubst %/,%,$(filter %/, $(obj-m))) DUMMY; do \
+ 	 if [ $$d != DUMMY ]; then $(MAKE) -C $$d cleanup || exit 1; fi; \
+diff -urN alsa-driver-1.0.23/Rules.make1 alsa-driver-1.0.23-install/Rules.make1
+--- alsa-driver-1.0.23/Rules.make1	2010-04-16 07:11:04.000000000 -0400
++++ alsa-driver-1.0.23-install/Rules.make1	2010-05-08 15:49:01.000000000 -0400
+@@ -59,7 +59,7 @@
+ 
+ .PHONY: clean1
+ clean1:
+-	rm -f .depend *.[oas] *.ko .*.cmd .*.tmp *.mod.c *.isapnp $(clean-files)
++	rm -f .depend *.[oas] *.ko .*.cmd .*.tmp *.mod.c *.isapnp
+ 
+ .PHONY: clean
+ clean: $(patsubst %,_sfclean_%,$(ALL_SUB_DIRS)) clean1
+diff -urN alsa-driver-1.0.23/symvers-update alsa-driver-1.0.23-install/symvers-update
+--- alsa-driver-1.0.23/symvers-update	1969-12-31 19:00:00.000000000 -0500
++++ alsa-driver-1.0.23-install/symvers-update	2010-05-08 15:49:01.000000000 -0400
+@@ -0,0 +1,45 @@
++#!/usr/bin/perl
++#
++# Copyright (c) 2007 Linuxant inc.
++#
++# Licensed under the GPL, see COPYING for details.
++#
++
++my $prog = "symvers-update";
++
++if (!defined($ARGV[0]) || !defined($ARGV[1]) || defined($ARGV[2])) {
++	print "Usage: $prog <original_file> <new_file>\n\n";
++	print "Updates original_file symvers with updated entries from new_file.\n";
++
++	exit 1;
++}
++
++open(ORIG, "<$ARGV[0]") || die "$prog: can't open '$ARGV[0]': $!";
++open(NEW, "<$ARGV[1]") || die "$prog: can't open '$ARGV[1]': $!";
++
++my %symdb;
++
++while (<ORIG>) {
++	my ($crc, $sym, $file, $type) = split /\t/;
++	$symdb{$sym} = "$crc\t$sym\t$file\t$type";
++}
++
++close ORIG;
++
++while (<NEW>) {
++	my ($crc, $sym, $file, $type) = split /\t/;
++	$symdb{$sym} = "$crc\t$sym\t$file\t$type";
++}
++
++close NEW;
++
++open(OUT, ">$ARGV[0]") || die "$prog: can't open '$ARGV[0]': $!";
++
++foreach (keys %symdb) {
++	print OUT $symdb{$_};
++}
++
++close OUT;
++
++exit 0;
++
+diff -urN alsa-driver-1.0.23/utils/alsasound alsa-driver-1.0.23-install/utils/alsasound
+--- alsa-driver-1.0.23/utils/alsasound	2010-04-16 07:17:35.000000000 -0400
++++ alsa-driver-1.0.23-install/utils/alsasound	2010-05-08 15:49:01.000000000 -0400
+@@ -25,7 +25,7 @@
+ #
+ #
+ # For RedHat 5.0+:
+-# chkconfig: 2345 87 14
++# chkconfig: 2345 8 92
+ # description: ALSA driver
+ #
+ # modified to visually fit into SuSE 6.0+ by Philipp Thomas <pthomas@suse.de>
+@@ -196,6 +196,21 @@
+ # See how we were called.
+ case "$1" in
+   start)
++	# compile kernel modules if a new kernel was booted
++	if [ ! -e /lib/modules/`uname -r`/alsa-backup.tar ]; then
++	  buildlog=/var/run/alsa-driver.$$.log
++	  echo -n "Building modules for the `uname -r` kernel, please wait..."
++	  ( cd /usr/lib/alsa-driver-linuxant && make mrproper && ./configure && make && make install-kernel mrproper ) > "${buildlog}" 2>&1
++	  ret=$?
++	  echo " done."
++	  if [ ${ret} -ne 0 ]; then
++	    echo 2>&1 "ERROR: Build failed. Please review the build log at ${buildlog}."
++	    echo 2>&1 "Original kernel modules will be used."
++	  else
++	    rm -f "${buildlog}"
++	  fi
++	fi
++
+         # Start driver if it isn't already up.
+ 	if [ ! -d /proc/asound ]; then
+ 	  start
+diff -urN alsa-driver-1.0.23/utils/alsasound.in alsa-driver-1.0.23-install/utils/alsasound.in
+--- alsa-driver-1.0.23/utils/alsasound.in	2010-04-16 07:11:04.000000000 -0400
++++ alsa-driver-1.0.23-install/utils/alsasound.in	2010-05-08 15:49:01.000000000 -0400
+@@ -25,19 +25,19 @@
+ #
+ #
+ # For RedHat 5.0+:
+-# chkconfig: 2345 87 14
+-# description: ALSA driver
++# chkconfig: 2345 8 92
++# description: ALSA driver (Linuxant)
+ #
+ # modified to visually fit into SuSE 6.0+ by Philipp Thomas <pthomas@suse.de>
+ # further improvements by Bernd Kaindl, Olaf Hering and Takashi Iwai.
+ # 
+ ### BEGIN INIT INFO
+-# Provides:       alsasound
++# Provides:       alsa-driver-linuxant
+ # Required-Start: $remote_fs
+ # Required-Stop: $remote_fs
+ # Default-Start:  2 3 5
+ # Default-Stop:
+-# Description:    Loading ALSA drivers and store/restore the current setting
++# Description:    Loading ALSA drivers and store/restore the current setting (Linuxant)
+ ### END INIT INFO
+ 
+ if [ -r /etc/rc.config ]; then
+@@ -196,6 +196,21 @@
+ # See how we were called.
+ case "$1" in
+   start)
++	# compile kernel modules if a new kernel was booted
++	if [ ! -e /lib/modules/`uname -r`/alsa-backup.tar ]; then
++	  buildlog=/var/run/alsa-driver.$$.log
++	  echo -n "Building modules for the `uname -r` kernel, please wait..."
++	  ( cd /usr/lib/alsa-driver-linuxant && make mrproper && ./configure && make && make install-kernel mrproper ) > "${buildlog}" 2>&1
++	  ret=$?
++	  echo " done."
++	  if [ ${ret} -ne 0 ]; then
++	    echo 2>&1 "ERROR: Build failed. Please review the build log at ${buildlog}."
++	    echo 2>&1 "Original kernel modules will be used."
++	  else
++	    rm -f "${buildlog}"
++	  fi
++	fi
++
+         # Start driver if it isn't already up.
+ 	if [ ! -d /proc/asound ]; then
+ 	  start

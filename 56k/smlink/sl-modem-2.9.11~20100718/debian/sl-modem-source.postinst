@@ -1,0 +1,39 @@
+#!/bin/sh
+set -e
+
+CVERSION=$(dpkg-query -W -f='${Version}' sl-modem-source | sed -e 's/\(.*\)-.*/\1/')
+ARCH=`dpkg --print-architecture`
+
+daemon_stop () {
+   if [ -e /var/run/slmodemd.pid ] ; then
+      invoke-rc.d sl-modem-daemon stop || true
+      sleep 1
+   fi
+}
+
+case "$1" in
+  configure)
+    if [ -x /usr/lib/dkms/common.postinst ]; then
+      /usr/lib/dkms/common.postinst sl-modem $CVERSION /usr/share/sl-modem-source $ARCH $2
+
+      # If either slamr or slusb module is actually in use, stop slmodemd, and 
+      # remove the respective module:
+      for module in slamr slusb ; do
+        if grep -q "$module" /proc/modules 2>/dev/null ; then
+          daemon_stop
+          rmmod $module
+        fi
+      done
+      modprobe slamr 2>/dev/null || modprobe slusb 2>/dev/null || true
+
+      # If slmodemd is running and we are upgrading, then restart slmodemd:
+      if [ -e /var/run/slmodemd.pid -a -n "$2" ]; then
+        invoke-rc.d sl-modem-daemon restart || true
+      fi
+
+    fi
+  ;;
+esac
+
+#DEBHELPER#
+

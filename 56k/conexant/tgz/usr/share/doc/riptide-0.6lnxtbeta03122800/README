@@ -1,0 +1,61 @@
+This package contains Linux drivers for the
+Conexant (Rockwell) RipTide Audio/Communication Controller.
+
+These drivers are not fully tested and no longer being actively
+developed, because they are based on the OSS interface, which will soon be
+obsoleted in favor of ALSA. Linuxant is distributing them as open-source in
+the hope that they are useful to others, especially as a starting point for
+proper ALSA drivers.
+
+If you have a RipTide HCF modem (127A:4321 or 127A:4331), you need to
+install *both* the RIPTIDE and HCF drivers, otherwise the modem will *not*
+work.
+
+RipTide HSF modems (127A:4311 or 14F1:4311) require only the HSF driver,
+on top of which the RIPTIDE driver can be optionally installed to add audio,
+synth, midi, and gameport functionality.
+
+
+RIPTIDE driver Features:
+-----------------------
+
+1. OSS compatible. We are hoping that somebody with more time can turn
+this code into a modern ALSA driver someday..
+
+2. Full duplex PCM playback and record.
+
+3. Multiple playback channels (/dev/dsp).
+
+4. Mixer support (/dev/mixer).
+
+5. Supports direct access interface for games such as Quake2.
+
+6. Supports OPL3 synthesis (/dev/sequencer)
+
+7. Supports MPU401 external MIDI (/dev/midi)
+
+8. Supports joystick at port 0x201 with system driver
+   (joy-analog.o should be loaded)
+
+9. Interoperates with HCF and HSF modem drivers.
+
+The latest version and related information are available
+from http://www.linuxant.com on the web.
+
+These drivers should work on most current Linux distributions, based on
+the 2.2.x or 2.4.x kernels. On some systems, it might be necessary
+to disable the "PnP OS" BIOS option if it exists.
+
+See the INSTALL file for installation instructions.
+
+THIS IS PRELIMINARY SOFTWARE WHICH MAY CONTAIN BUGS THAT COULD
+CAUSE CRASHES AND DATA CORRUPTION. THE USE OF THIS SOFTWARE
+IS AT YOUR OWN RISK. WE DO NOT PRESENTLY RECOMMEND USING IT ON
+CRITICAL SYSTEMS AND ONLY AFTER DOING COMPLETE BACKUPS.
+
+Some features may not be implemented or work as expected.
+Bug reports are welcome. (see section "REPORTING PROBLEMS" in INSTALL file)
+
+Most files in this package are released under terms similar to the
+BSD license. See the file LICENSE for details.
+

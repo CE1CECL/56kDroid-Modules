@@ -1,0 +1,202 @@
+Sun Dec 28 2003 -
+	* Released riptide-0.6lnxtbeta03122800.
+
+Sun Dec 28 2003 -
+	* Added support and pre-built binary packages for Fedora Core 1.
+	* Added pre-built binary packages for the latest RedHat, Mandrake,
+	and Turbolinux kernel updates.
+	* Fixed deprecated tail syntax in kernelcompiler.sh script.
+
+Fri Nov 21 2003 -
+	* Added Turbolinux support.
+
+Tue Nov 11 2003 -
+	* Released riptide-0.6lnxtbeta03111100.
+
+Tue Nov 11 2003 -
+	* Added pre-built binary packages for the following distributions:
+		- Mandrake 9.2
+		- SuSE 9.0
+	* scripts/ripconfig.in, modules/kernelcompiler.sh: unset LANG.
+
+Fri Sep 12 2003 -
+	* Released riptide-0.6lnxtbeta03091200.
+
+Fri Sep 12 2003 -
+	* modules/kernelcompiler.sh: improved to avoid building modules
+	with gcc 2.x for kernels compiled with gcc 3.x. This was the cause
+	of some oops, notably on Debian.
+
+Mon Sep 08 2003 -
+	* Released riptide-0.6lnxtbeta03090800.
+
+Thu Sep 04 2003 -
+	* makefile, riptide.spec.in: Updated build infrastructure.
+
+Sun Apr 27 2003 -
+	* Released riptide-0.5lnxtbeta03042700.
+
+Sun Apr 27 2003 -
+	* makefile, riptide.spec.in: changes to build packages for newer
+	SuSE versions with i586 arch and athlon kernels.
+	* modules/kernelcompiler.sh: fixed SuSE 8.2 issue.
+	* scripts/ripconfig.in: improved dump_diagnostics() and added --noprobe
+	option.
+	* scripts/ripconfig.in: use ${AWK} (gawk if present) instead of awk.
+	* scripts/ripconfig.in: fix link problem in create_temp_kernel_tree().
+
+Mon Apr 21 2003 -
+	* Released riptide-0.5lnxtbeta03042100.
+
+Mon Apr 21 2003 -
+	* modules/linux.h: use pte_offset_kernel() as alternative
+	to pte_offset() (RedHat 9).
+	* FAQ: updated.
+
+Wed Apr 16 2003 -
+	* Released riptide-0.5lnxtbeta03041600.
+
+Wed Apr 16 2003 -
+	* FAQ: major update.
+	* makefile: added rule to sign rpm packages.
+	* modules/rt_hw.c: RipTideSetFragment(): limit fragsize to
+	MAX_FRAG_SIZE to prevent lockups when applications
+	such as xmcd in CDDA playback mode request very large
+	fragment sizes. (thanks to Frederic.NYER@wanadoo.fr)
+
+Wed Apr 16 2003 -
+	* Added pre-built binary packages for the following
+	distributions/kernel versions:
+		Mandrake 9.1 linux-2.4.21-0.13mdk
+		Mandrake 9.0 linux-2.4.19-32mdk
+		RedHat 9 linux-2.4.20-8 and -9
+		RedHat 8.0 linux-2.4.18-27.8.0
+		SuSE 8.2 2.4.20-4GB
+	* modules/kernelcompiler.sh: updated.
+	* modules/rp_cmdif.h: added parentheses to eliminate gcc warnings.
+
+Wed Apr 16 2003 -
+	* modules/riptidem.c: comment-out code to obtain init_mm_ptr
+	since it isn't used right now and causes problems under RedHat 9.
+	* modules/linux.c: #include <linux/highmem.h> for kernels >= 2.4.
+	This should solve the kmap_pagetable unresolved symbol problem.
+	* modules/linux.c: changed sysObj->spinlock to sysObj->lock in
+	init_spinlock() and release_spinlock(). Thanks to
+	Jason Anderson for reporting this problem.
+
+Wed Apr 16 2003 -
+	* modules/riptidem.c: incorporated bug fixes and changes
+	by Frederic.NYER@wanadoo.fr:
+	  - Can't change cd volume
+		Line 408 should be "read = 1;"
+	  - Setting video volume changes line volume
+		Lines 455 and 460 should be "wId = MXMIX_VIDEO"
+	  - Muting Rec Level mutes line
+		Line 678 computes MXMUTE wId through "wId - MXMIX_MASTER +
+		MXMUTE_MASTER" This works for any mixer input but
+		MXMUX_MASTER which has a non adjacent ID
+		I have added a mutewId variable which is computed earlier on.
+	  - Can't set speaker (i.e. modem) volume
+		It isn't linked to any mixer channed. (Actually, there is
+		nothing to be done at line 372). I've linked it to MXMIX_PHONE
+	  - Can't select video as record source (under kmix)
+		This looks like a kmix bug. However, renaming video into line2
+		makes it selectable.
+		This affects the lines 140, 300, 452, 454, 457, 459, 509, 551,
+		595, 652
+	  - Mic and speaker should be mono
+		I have added a mono variable which is set when dealing with
+		speaker or mic.
+		This variable makes the OSS left channel to be sent to both
+		right and left hardware channels.
+	  - Xine crashes at first startup
+		This happens when it try to auto-probe the hardware
+		capabilities. In fact, it issues a dsp ioctl
+		(SNDCTL_DSP_GETODELAY) which is not implemented and which makes
+		it crash.  I've added a 'printk' to be a bit more explicit
+		about it. Also, the dsp ioctl handler is calling the mixer
+		ioctl handler on unknown ioctl (Line 1739)... I found it
+		strange and I removed it.
+
+Wed Apr 16 2003 -
+	* Now officially maintained and distributed by Linuxant.
+
+Wed Dec 25 2002 -
+	* Released riptide-0.4mbsibeta02122500.
+
+Wed Dec 25 2002 -
+	* makefile: added Mandrake 9.0 linux-2.4.19-19mdk kernel.
+	* makefile: added RedHat 2.4.18-19.7.x and 2.4.18-19.8.0 kernels.
+
+Sun Nov 03 2002 -
+	* Released riptide-0.4mbsibeta02110301.
+
+Sun Nov 03 2002 -
+	* modules/kernelcompiler.sh: use gcc 3 to build modules for
+	SuSE's 2.4.19-4GB kernel.
+
+Sun Nov 03 2002 -
+	* Released riptide-0.4mbsibeta02110300.
+
+Sun Nov 03 2002 -
+	* makefile: added RedHat 2.4.18-17.7.x and 2.4.18-17.8.0 kernels.
+	* makefile: added SuSE 2.4.19-4GB kernel.
+	* modules/kernelcompiler.sh: use gcc 3 to build modules for
+	RedHat's 2.4.18-17.8.0 kernel.
+	* scripts/ripconfig.in: put module configuration in /etc/modules.d and
+	run update-modules if present (for gentoo).
+
+Fri Oct 11 2002 -
+	* Released riptide-0.4mbsibeta02101001.
+
+Fri Oct 11 2002 -
+	* modules/kernelcompiler.sh: use gcc 3 to build modules for
+	RedHat's 2.4.18-14 kernel.
+
+Thu Oct 10 2002 -
+	* Released riptide-0.4mbsibeta02101000.
+
+Thu Oct 10 2002 -
+	* makefile: added RedHat 8.0 linux-2.4.18-14 kernel.
+	* makefile: added Mandrake 9.0 linux-2.4.19-16mdk kernel and
+	removed obsolete SuSE 2.4.4-4GB kernel.
+	* modules/kernelcompiler.sh: added gcc-2.96 (for Mandrake 9) and
+	RPM_BUILD_ROOT support.
+
+Sun Sep 29 2002 -
+	* makefile: tardist: changed way tar.gz files are generated to
+	avoid gzip "decompression OK, trailing garbage ignored" messages.
+
+Wed Sep 18 2002 -
+	* rt_hw.c:RipTideCreateChannel(): initialize pChannelInfo->sgdList
+	to NULL. (Thanks to nokos@gmx.net for this fix)
+
+Sun Sep 01 2002 -
+	* Released riptide-0.4mbsibeta02090100.
+
+Sun Sep 01 2002 -
+	* modules/riptidem.c: rt_poll(): finally implemented! Debug msgs gone.
+	Driver should now work with desktop audio daemons, such as KDE's artsd.
+	* modules/riptidem.c: rt_read_dsp(), rt_write_dsp(): don't sleep if
+	O_NONBLOCK.
+	* scripts/ripconfig.in: added extra /etc/modules.conf aliases for
+	automatic devfs module loading.
+	* makefile: added Mandrake 2.4.18-8.1mdk kernel.
+	* makefile: added RedHat 2.4.9-34, 2.4.18-5, and 2.4.18-10 kernels.
+	* Added modules/kernelcompiler.sh, a small script which tries
+	to guess which compiler should be used to build kernel modules.
+	* modules/common.mak: use kernelcompiler.sh to determine default CC
+	* modules/common.mak, INSTALL: added notes about KERNELSRC for
+	Debian 3.0 users.
+
+Wed Jun 12 2002 -
+	* Released riptide-0.3mbsibeta02061200.
+
+Wed Jun 12 2002 -
+	* scripts/ripconfig.in: dynamically allocate sound-slot-N alias names.
+	* modules/rt_mdl.c: do not request_region() for hwIOSynth as it
+	conflicts with opl3 module.
+	* modules/: silenced some debugging messages.
+
+Tue Jun 11 2002 -
+	* Initial beta version (riptide-0.3mbsibeta02061100).

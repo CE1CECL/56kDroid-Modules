@@ -1,0 +1,62 @@
+diff -urN alsa-driver-git20090424/configure.in alsa-driver-git20090424-bool/configure.in
+--- alsa-driver-git20090424/configure.in	2009-04-24 13:16:07.000000000 -0400
++++ alsa-driver-git20090424-bool/configure.in	2009-04-24 15:00:18.000000000 -0400
+@@ -2953,6 +2953,35 @@
+   AC_DEFINE(CONFIG_HAVE_PAGE_TO_PFN)
+ fi
+ 
++dnl Check for bool
++AC_MSG_CHECKING(for bool)
++fmode_t_defined="0"
++ac_save_CFLAGS="$CFLAGS"
++ac_save_CC="$CC"
++CFLAGS="$KERNEL_CHECK_CFLAGS"
++CC=$KCC
++AC_TRY_COMPILE([
++#define __KERNEL__
++#ifdef CONFIG_HAVE_DEPRECATED_CONFIG_H
++#include <linux/autoconf.h>
++#else
++#include <linux/config.h>
++#endif
++#include <linux/types.h>
++],[
++       bool foo;
++],
++    AC_MSG_RESULT(yes);bool_defined="1",
++    AC_MSG_RESULT(no);bool_defined="0",
++    AC_MSG_RESULT(unknown);bool_defined="0"
++)
++CFLAGS=$ac_save_CFLAGS
++CC=$ac_save_CC
++CONFIG_HAVE_BOOL=$bool_defined
++if test "$CONFIG_HAVE_BOOL" = "1"; then
++  AC_DEFINE(CONFIG_HAVE_BOOL)
++fi
++
+ dnl Check for init_utsname...
+ if test "$kversion.$kpatchlevel" = "2.6" -a $ksublevel -ge 19; then
+   CONFIG_HAVE_INIT_UTSNAME=1
+diff -urN alsa-driver-git20090424/include/adriver.h alsa-driver-git20090424-bool/include/adriver.h
+--- alsa-driver-git20090424/include/adriver.h	2009-04-24 13:16:07.000000000 -0400
++++ alsa-driver-git20090424-bool/include/adriver.h	2009-04-27 15:56:17.000000000 -0400
+@@ -1823,7 +1823,7 @@
+ #ifndef CONFIG_SND_HAS_BUILTIN_BOOL
+ typedef int _Bool;
+ #endif
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19)
++#ifndef CONFIG_HAVE_BOOL
+ #ifndef bool	/* just to be sure */
+ #if !defined(RHEL_RELEASE_CODE) || RHEL_RELEASE_CODE < RHEL_RELEASE_VERSION(5, 4)
+ typedef _Bool bool;
+diff -urN alsa-driver-git20090424/include/config.h.in alsa-driver-git20090424-bool/include/config.h.in
+--- alsa-driver-git20090424/include/config.h.in	2009-04-24 13:16:07.000000000 -0400
++++ alsa-driver-git20090424-bool/include/config.h.in	2009-04-24 15:00:18.000000000 -0400
+@@ -55,6 +55,7 @@
+ #undef CONFIG_SND_HAS_BUILTIN_BOOL
+ 
+ /* 2.4/2.6 kernels */
++#undef CONFIG_HAVE_BOOL
+ #undef CONFIG_HAVE_PCI_CONSISTENT_DMA_MASK
+ #undef CONFIG_HAVE_KCALLOC
+ #undef CONFIG_HAVE_KSTRDUP

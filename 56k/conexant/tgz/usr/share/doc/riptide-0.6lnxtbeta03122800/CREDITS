@@ -1,0 +1,10 @@
+Thanks to the amazing engineers (especially Konstantin Lazarev for writing
+the first versions of this driver) and the great management at Conexant for
+their wonderful cooperation and understanding and support of Linux. 
+
+Thanks to Linus Torvalds, Theodore Ts'o for their previous work on
+the Linux serial driver, and Russell King for the new UART-independent core.
+
+Thanks to all beta testers and people who have sent bug reports and patches.
+
+-Marc Boucher <marc@linuxant.com>

@@ -1,0 +1,15 @@
+diff -urN alsa-driver-1.0.23/alsa-kernel/drivers/dummy.c alsa-driver-1.0.23-hrtimer_forward_now/alsa-kernel/drivers/dummy.c
+--- alsa-driver-1.0.23/alsa-kernel/drivers/dummy.c	2010-04-16 07:10:10.000000000 -0400
++++ alsa-driver-1.0.23-hrtimer_forward_now/alsa-kernel/drivers/dummy.c	2010-05-09 15:57:55.000000000 -0400
+@@ -388,7 +388,10 @@
+ 	if (!atomic_read(&dpcm->running))
+ 		return HRTIMER_NORESTART;
+ 	tasklet_schedule(&dpcm->tasklet);
+-	hrtimer_forward_now(timer, dpcm->period_time);
++
++	/* We could use hrtimer_forward_now but not all kernels support it */
++	hrtimer_forward(timer, timer->base->get_time(), dpcm->period_time);
++
+ 	return HRTIMER_RESTART;
+ }
+ 

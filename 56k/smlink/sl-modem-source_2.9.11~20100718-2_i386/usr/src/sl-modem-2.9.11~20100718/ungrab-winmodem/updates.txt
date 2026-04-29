@@ -1,0 +1,10 @@
+
+20082701 - Support for Motorola chipset 1057:3052 retained, and Silicon Instr. 1543:3052 added.
+After testing support removed for 1053:3000, Broadcom and vendor=11d4 Analog Devices Inc (Motorola proxy) removed. 
+Marv Stodolsky
+
+20090716 - Thanks to Philippe Vouters
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,21)
+#define pci_find_device pci_get_device
+#endif
+

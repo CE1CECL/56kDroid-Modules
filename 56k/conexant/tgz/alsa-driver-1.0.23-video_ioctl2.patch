@@ -1,0 +1,11 @@
+diff -urN alsa-driver-1.0.20/i2c/other/tea575x-tuner.c alsa-driver-1.0.20-video_ioctl2/i2c/other/tea575x-tuner.c
+--- alsa-driver-1.0.20/i2c/other/tea575x-tuner.c	2009-05-06 03:07:21.000000000 -0400
++++ alsa-driver-1.0.20-video_ioctl2/i2c/other/tea575x-tuner.c	2009-06-11 13:55:38.000000000 -0400
+@@ -1,6 +1,7 @@
+ #include "alsa-autoconf.h"
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30)
++#include <media/v4l2-ioctl.h>
+ #include "adriver.h"
+ #include "../../alsa-kernel/i2c/other/tea575x-tuner.c"
+ #else

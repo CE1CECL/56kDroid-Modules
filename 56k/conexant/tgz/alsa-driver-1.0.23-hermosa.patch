@@ -1,0 +1,59 @@
+diff -urN --show-c-function alsa-driver-git20100411-smartaudio/alsa-kernel/pci/hda/patch_conexant.c alsa-driver-git20100411-hermosa/alsa-kernel/pci/hda/patch_conexant.c
+--- alsa-driver-git20100411-smartaudio/alsa-kernel/pci/hda/patch_conexant.c	2010-04-11 15:01:00.000000000 -0400
++++ alsa-driver-git20100411-hermosa/alsa-kernel/pci/hda/patch_conexant.c	2010-04-11 15:23:20.000000000 -0400
+@@ -1945,14 +1945,24 @@ static void cxt5051_update_speaker(struc
+ {
+ 	struct conexant_spec *spec = codec->spec;
+ 	unsigned int pinctl;
+-	/* headphone pin */
+-	pinctl = (spec->hp_present && spec->cur_eapd) ? PIN_HP : 0;
+-	snd_hda_codec_write(codec, 0x16, 0, AC_VERB_SET_PIN_WIDGET_CONTROL,
+-			    pinctl);
+-	/* speaker pin */
++
++	/* speaker pin (Stereo) */
+ 	pinctl = (!spec->hp_present && spec->cur_eapd) ? PIN_OUT : 0;
+ 	snd_hda_codec_write(codec, 0x1a, 0, AC_VERB_SET_PIN_WIDGET_CONTROL,
+ 			    pinctl);
++
++	/* headphone pin (Port A (HP)) */
++	pinctl = ((spec->hp_present & 1) && spec->cur_eapd) ? PIN_HP : 0;
++	snd_hda_codec_write(codec, 0x16, 0, AC_VERB_SET_PIN_WIDGET_CONTROL,
++			    pinctl);
++
++	// Port D (LO), overriden by Port A
++	if(pinctl)
++		pinctl = 0;
++	else
++		pinctl = ((spec->hp_present & 2) && spec->cur_eapd) ? PIN_HP : 0;
++	snd_hda_codec_write(codec, 0x19, 0, AC_VERB_SET_PIN_WIDGET_CONTROL,
++			    pinctl);
+ }
+ 
+ /* turn on/off EAPD (+ mute HP) as a master switch */
+@@ -2011,7 +2021,10 @@ static void cxt5051_hp_automute(struct h
+ {
+ 	struct conexant_spec *spec = codec->spec;
+ 
+-	spec->hp_present = snd_hda_jack_detect(codec, 0x16);
++        /* Port A */
++	spec->hp_present = !!snd_hda_jack_detect(codec, 0x16);
++	/* Port D */
++	spec->hp_present |= (!!snd_hda_jack_detect(codec, 0x19)) << 1;
+ 
+ 	cxt_smartaudio_notify(spec->hp_present, -1);
+ 
+@@ -2102,9 +2115,12 @@ static struct hda_verb cxt5051_init_verb
+ 	/* SPK  */
+ 	{0x1a, AC_VERB_SET_PIN_WIDGET_CONTROL, PIN_OUT},
+ 	{0x1a, AC_VERB_SET_CONNECT_SEL, 0x00},
+-	/* HP, Amp  */
++	/* Port A: HP, Amp  */
+ 	{0x16, AC_VERB_SET_PIN_WIDGET_CONTROL, PIN_HP},
+ 	{0x16, AC_VERB_SET_CONNECT_SEL, 0x00},
++	/* Port D: LO */
++	{0x19, AC_VERB_SET_PIN_WIDGET_CONTROL, PIN_OUT},
++	{0x19, AC_VERB_SET_CONNECT_SEL, 0x00},
+ 	/* DAC1 */	
+ 	{0x10, AC_VERB_SET_AMP_GAIN_MUTE, AMP_OUT_UNMUTE},
+ 	/* Record selector: Int mic */

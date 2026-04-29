@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Copyright (c) 2003 Linuxant inc.
+# Copyright (c) 2001-2003 Conexant Systems, Inc.
+#
+# NOTE: The use and distribution of this software is governed by the terms in
+# the file LICENSE, which is included in the package. You must read this and
+# agree to these terms before using or distributing this software.
+# 
+# This script tries to unload all hcf modules present in the system
+#
+PATH=/usr/sbin:/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
+export PATH
+
+for mod in riptidelow riptidesound riptideint; do
+	if lsmod | grep -q "^${mod} "; then
+		rmmod ${mod} || exit 1
+	fi
+done

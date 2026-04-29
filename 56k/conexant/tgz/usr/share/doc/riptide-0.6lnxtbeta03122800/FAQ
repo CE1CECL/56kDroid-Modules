@@ -1,0 +1,138 @@
+Questions:
+
+1) My RipTide card's modem doesn't work.
+2) Is the message about the kernel being tainted upon loading the modules 
+normal?
+3) I have an ACPI-based machine and the driver is crashing or not loading.
+4) rpm -i gives me this error: "Failed dependencies: pciutils is needed by ..."
+5) ripconfig gives me this error: "lspci: command not found"
+6) Modules crash upon loading or refuse to load due to a wrong compiler version.
+7) Where does ripconfig look for the kernel sources?
+8) I'm having problems uninstalling the RPM package.
+9) What does "warning: ...rpm: V3 DSA signature: NOKEY, key ID 5dfbf7dc" mean?
+10) Do you support other operating systems (eg. BeOS, FreeBSD, OpenBSD, etc.)?
+
+
+Answers:
+
+1) My RipTide card's modem doesn't work.
+
+	The RipTide modem part is supported by the HCF or HSF drivers (depending
+	on the type of your board) available from:
+		http://www.linuxant.com/drivers/
+
+
+2) Is the message about the kernel being tainted upon loading the modules 
+normal?
+
+	Yes, and it can be safely ignored.
+
+
+3) I have an ACPI-based machine and the driver is crashing or not loading.
+
+	It might be necessary to recompile a generic kernel from
+	ftp.kernel.org with the latest ACPI (and perhaps also KACPID
+	kernel lost interrupt) patches from http://sf.net/projects/acpi/
+
+	Alternatively you could try the 2.6 development kernel, which has
+	better ACPI support. However we cannot guarantee that the drivers
+	will work with development kernels since they are constantly evolving.
+
+
+4) rpm -i gives me this error: "Failed dependencies: pciutils is needed by ..."
+
+	You need to install the pciutils package before installing the
+	driver. This package contains "lspci" which is used by ripconfig
+	to detect your card. 
+
+	pciutils should be installed from your Linux distribution CD. If
+	your distribution supports RPM, then the install command should be
+	similar to this: rpm -i /path/to/rpms/pciutils-....rpm
+
+
+5) ripconfig gives me this error: "lspci: command not found"
+
+	ripconfig requires lspci to detect your card. lspci comes
+	with pciutils. We recommend that you install pciutils, but you can also
+	configure the device manually. ripconfig will always fail if you
+	try to use the "-a" option without pciutils installed.
+
+	pciutils should be installed from your Linux distribution CD. If
+	your distribution supports RPM, then the install command should be
+	similar to this: rpm -i /path/to/rpms/pciutils-....rpm
+
+
+6) Modules crash upon loading or refuse to load due to a wrong compiler version.
+
+	It is very important that the driver modules be compiled with
+	the same compiler version that was used to build your kernel.
+	If the wrong version is used (i.e. gcc2 instead of gcc3 or vice-versa)
+	the system may crash or refuse to load the modules.
+
+	You can use the command "cat /proc/version" and "gcc -v" to
+	check the version strings.
+
+
+7) Where does ripconfig look for the kernel sources?
+
+	By default, ripconfig looks for the symbolic link
+	/lib/modules/(kernelversion)/build
+	If this link exists and points to a valid directory, then
+	ripconfig will use this directory as the kernel sources'
+	location.
+
+	If the link does not exist, ripconfig will try to use
+	/usr/src/linux or /usr/local/src/linux. 
+
+	Please note that if your kernel sources are in /usr/local/src/linux,
+	but you also have a /usr/src/linux link pointing to an invalid or empty
+	directory, then ripconfig will try to use /usr/src/linux
+	and it will fail.
+
+	It is VERY important that the kernel sources' version match the kernel
+	version that you are currently running. If it isn't the case, then
+	ripconfig will report and error.
+
+
+8) I'm having problems uninstalling the RPM package.
+
+	Try the following command:
+
+	rpm -e --noscripts --force --allmatches riptide
+
+	If the driver prevents your system from starting normally,
+	you could try booting in 'single user' or 'failsafe' mode first.
+
+
+9) What does "warning: ...rpm: V3 DSA signature: NOKEY, key ID 5dfbf7dc" mean?
+
+	Before installing a package, RPM tries to verify its integrity.
+	
+	The packages distributed by Linuxant are cryptographically
+	signed with our public PGP key, which is not known to RPM by
+	default. However, it can be found on many keyservers or downloaded from
+
+	http://www.linuxant.com/pubkey.asc
+
+	Once you have downloaded our public key, you can import it in your
+	RPM database. You can do this with the following command:
+
+	rpm --import /path/to/pubkey.asc
+
+	After the key has been imported, the NOKEY warning messages should
+	disappear.
+
+	Afterward, a package's signature can be verified with the command:
+
+	rpm --checksig /path/to/package.rpm
+
+
+10) Do you support other operating systems (eg. BeOS, FreeBSD, OpenBSD, etc.)?
+
+	At this time, we only distribute Linux drivers and there
+	are currently no plans to support other operating systems.
+
+	However, people interested in porting the drivers to other operating
+	systems should contact us.
+
+

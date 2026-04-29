@@ -1,0 +1,15 @@
+diff -urN --show-c-function alsa-driver-git20100411-smartaudio/alsa-kernel/pci/hda/hda_intel.c alsa-driver-git20100411-bdl_pos_adj/alsa-kernel/pci/hda/hda_intel.c
+--- alsa-driver-git20100411-smartaudio/alsa-kernel/pci/hda/hda_intel.c	2010-04-11 14:26:02.000000000 -0400
++++ alsa-driver-git20100411-bdl_pos_adj/alsa-kernel/pci/hda/hda_intel.c	2010-04-11 15:31:58.000000000 -0400
+@@ -2457,10 +2457,10 @@ static int __devinit azx_create(struct s
+ 
+ 	if (bdl_pos_adj[dev] < 0) {
+ 		switch (chip->driver_type) {
+-		case AZX_DRIVER_ICH:
+ 		case AZX_DRIVER_PCH:
+ 			bdl_pos_adj[dev] = 1;
+ 			break;
++		case AZX_DRIVER_ICH:
+ 		default:
+ 			bdl_pos_adj[dev] = 32;
+ 			break;

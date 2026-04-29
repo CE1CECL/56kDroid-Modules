@@ -1,0 +1,12 @@
+--- alsa-driver-git20081204/include/adriver.h	2008-11-28 11:41:50.000000000 -0500
++++ alsa-driver-git20081204-adriver/include/adriver.h	2008-12-04 14:10:34.000000000 -0500
+@@ -791,8 +791,8 @@
+ static inline void class_device_destroy(struct class *class, int devnum) { return; }
+ static inline void *class_get_devdata(struct class_device *dev) { return NULL; }
+ #else /* >= 2.6.2 */
+-#ifndef CONFIG_SND_NESTED_CLASS_DEVICE
+ #include <linux/device.h>
++#ifndef CONFIG_SND_NESTED_CLASS_DEVICE
+ #define class_device_create(cls,prt,devnum,args...) class_device_create(cls,devnum,##args)
+ #endif
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 8)

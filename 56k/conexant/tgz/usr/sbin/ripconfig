@@ -1,0 +1,827 @@
+#!/bin/sh
+#
+# Copyright (c) 2003 Linuxant inc.
+# Copyright (c) 2001-2003 Conexant Systems, Inc.
+#
+# NOTE: The use and distribution of this software is governed by the terms in
+# the file LICENSE, which is included in the package. You must read this and
+# agree to these terms before using or distributing this software.
+#
+# This script handles installation and configuration of the
+# RIPTIDE drivers under Linux.  It aspires to be distribution-neutral
+
+ask_yesno()
+{
+	$automode && return $2
+
+	while true; do
+		echo -n "$1"
+		read answer
+		case "${answer}" in
+		[yY] | [yY][eE][sS])
+			return 0
+			;;
+		[nN] | [nN][oO])
+			return 1
+			;;
+		"")
+			return $2
+			;;
+		*)
+			echo "Enter 'yes' or 'no'"
+			;;
+		esac
+	done
+}
+
+use_prebuilt_modules()
+{
+	rm -f "/lib/modules/`uname -r`/misc/riptide"*.o
+	if [ ! -d "/lib/modules/`uname -r`/misc" ]; then
+		mkdir -p "/lib/modules/`uname -r`/misc"
+	fi
+	ln -s "${riplibdir}/modules/binaries/$1/riptide"*.o "/lib/modules/`uname -r`/misc/"
+}
+
+files_present()
+{
+	for f; do
+		if [ ! -f "${f}" ]; then
+			missing_file="${f}"
+			return 1
+		fi
+	done
+}
+
+remove_temp_kernel_tree()
+{
+	if [ -n "${KERNELORG}" ]; then
+		rm -rf "${KERNELSRC}"
+		KERNELSRC="${KERNELORG}"
+		KERNELORG=""
+		return 0
+	fi
+
+	return 1
+}
+
+create_temp_kernel_tree()
+{
+	KERNELORG="${KERNELSRC}"
+	# get absolute pathname with cd/pwd to ensure that our temp dir
+	# is on same filesystem due to use of hardlinks by cp -al
+	KERNELSRC="`(cd \"${KERNELORG}\" && /bin/pwd)`-riptmp$$"
+	rm -rf "${KERNELSRC}"
+	if ! cp -al "${KERNELORG}/." "${KERNELSRC}"; then
+		remove_temp_kernel_tree
+		return 1
+	fi
+
+	return 0
+}
+
+kernelrebuild_instructions()
+{
+		echo ""
+		echo "First, ensure that the proper kernel source and compiler packages"
+		echo "from your distribution vendor and/or the community are installed."
+		echo ""
+		echo "The Linux kernel can then be reconfigured by running \"make menuconfig\""
+		echo "under the kernel source directory (usually /usr/src/linux)."
+		echo ""
+		echo "Verify that the proper options for your system are selected,"
+		echo "and that CONFIG_SMP (\"Symmetric multi-processing support\" under"
+		echo "\"Processor type and features\") is disabled, as this driver is"
+		echo "presently designed to work on single-processor machines."
+		echo ""
+		echo "Then compile and install your new kernel (for more information about"
+		echo "this procedure, see the README file under the kernel source directory),"
+		echo "reboot the system using the new kernel, and re-run \"ripconfig\"."
+}
+
+check_kernel()
+{
+	if [ -n "$OSKERNSMP" ]; then
+		echo 1>&2 ""
+		echo 1>&2 "RIPTIDE drivers have not been fully tested on SMP kernels."
+		echo 1>&2 "Please report results to <riptide-bugs@linuxant.com>"
+	fi
+
+	return 0
+}
+
+right_version_file()
+{
+	_versionf="$1"
+
+	[ -n "${KERNELVER}" ] || KERNELVER="`uname -r`"
+
+	FILEKERNELVER="`echo UTS_RELEASE | gcc -E -I"${KERNELSRC}/include" -include "${_versionf}" - | grep '^"' | tr -d '"	 '`"
+
+	[ "${KERNELVER}" = "${FILEKERNELVER}" ]
+}
+
+recompile_modules()
+{
+	KERNELVER="`uname -r`"
+	KERNELSRC=/usr/src/linux
+	KERNELORG=""
+
+	if [ -h /lib/modules/${KERNELVER}/build -a ! -d /lib/modules/${KERNELVER}/build/. ]; then
+		echo ""
+		echo "ERROR: /lib/modules/${KERNELVER}/build points to a missing directory"
+		echo ""
+		ls -l /lib/modules/${KERNELVER}/build
+		echo ""
+		echo "Please ensure that the kernel-headers or kernel-source package is installed."
+		return 1
+	fi
+
+	if [ -d /lib/modules/${KERNELVER}/build/include ]; then
+		KERNELSRC=/lib/modules/${KERNELVER}/build
+	elif [ ! -d "${KERNELSRC}" -a -d "/usr/local/src/linux" ]; then
+		KERNELSRC=/usr/local/src/linux
+	fi
+	if ! $automode; then
+		echo ""
+		echo "Where is the linux source build directory that matches your running kernel?"
+		echo -n "[${KERNELSRC}] "
+		read answer
+		case "${answer}" in
+		"")
+			;;
+		*)
+			KERNELSRC="${answer}"
+			;;
+		esac
+	fi
+
+	if ! files_present \
+		"${KERNELSRC}/include/linux/autoconf.h" \
+		"${KERNELSRC}/include/linux/version.h" \
+		"${KERNELSRC}/include/linux/modversions.h"; then
+		echo ""
+		echo "WARNING: missing file ${missing_file}"
+		suspect_tree=true
+	elif ! right_version_file "${KERNELSRC}/include/linux/version.h"; then
+		echo ""
+		echo "WARNING: the kernel version (${FILEKERNELVER}) defined in"
+		echo "${KERNELSRC}/include/linux/version.h"
+		echo "does not match the currently running kernel (${KERNELVER})"
+		echo "The cause of this problem is an incorrect kernel source path."
+		echo "Please check that ${KERNELSRC} points to the right tree."
+		suspect_tree=true
+	else
+		suspect_tree=false
+	fi
+
+	if ${suspect_tree}; then
+		echo "The cause of this problem is usually a missing or misconfigured"
+		echo "kernel source tree (and sometimes an incorrect directory or symbolic link)."
+		# SuSE has copies of autoconf.h and version.h available under /boot
+		if [ -d "${KERNELSRC}/include/linux" -a -f /boot/vmlinuz.autoconf.h -a -f /boot/vmlinuz.version.h ] && right_version_file /boot/vmlinuz.version.h && [ -f "${KERNELSRC}/include/linux/modversions.h" ]; then
+			echo ""
+			echo "However, proper /boot/vmlinuz.{autoconf.h,version.h} were found."
+			if ask_yesno "Would you like to try using them (in a temporary kernel tree)? [yes] " 0; then
+				if ! create_temp_kernel_tree; then
+					echo ""
+					echo "Unable to create temporary kernel tree"
+					kernelrebuild_instructions
+					return 1
+				fi
+				rm -f "${KERNELSRC}/include/linux/.config" \
+						"${KERNELSRC}/include/linux/autoconf.h" \
+						"${KERNELSRC}/include/linux/version.h"
+				if ! cp -p /boot/vmlinuz.autoconf.h "${KERNELSRC}/include/linux/autoconf.h" || \
+					! cp -p /boot/vmlinuz.version.h "${KERNELSRC}/include/linux/version.h"; then
+					echo ""
+					echo "Unable to copy files to temporary kernel tree"
+					remove_temp_kernel_tree
+					kernelrebuild_instructions
+					return 1
+				fi
+
+				# we don't really need .config but it can't hurt if available
+				if [ -f /boot/vmlinuz.config ]; then
+					cp -p /boot/vmlinuz.config "${KERNELSRC}/include/linux/.config"
+				fi
+			fi
+		fi
+	fi
+
+	# are we ok now?
+	if [ ! -f "${KERNELSRC}/include/linux/version.h" \
+			-o ! -f "${KERNELSRC}/include/linux/autoconf.h" \
+			-o ! -f "${KERNELSRC}/include/linux/modversions.h" ]; then
+		remove_temp_kernel_tree
+		kernelrebuild_instructions
+		return 1
+	fi
+
+	recomplogf=/tmp/ripconfig-buildlog.txt
+
+	# set FILEKERNELVER if it isn't already
+	[ -n "${FILEKERNELVER}" ] || right_version_file "${KERNELSRC}/include/linux/version.h"
+
+	echo ""
+	echo "Re-compiling RIPTIDE modules for kernel ${FILEKERNELVER}, using source directory"
+	echo "${KERNELSRC}. Please wait.."
+
+	(cd ${riplibdir}/modules && make "KERNELSRC=${KERNELSRC}" clean minstall) \
+		> ${recomplogf} 2>&1
+
+	res=$?
+
+	(cd ${riplibdir}/modules && make "KERNELSRC=${KERNELSRC}" clean) >/dev/null 2>&1
+
+	remove_temp_kernel_tree
+
+	if [ $res -eq 0 ]; then
+		rm -f ${recomplogf}
+		echo "Re-compilation and installation of RIPTIDE modules succeeded."
+		return 0
+	else
+		echo ""
+		echo "ERROR: Module re-compilation and installation failed!"
+		echo "Please examine the log file \"${recomplogf}\" to determine why."
+		return 1
+	fi
+}
+
+modules_exist()
+{
+	files_present "/lib/modules/`uname -r`/misc/riptide"*.o
+}
+
+remove_kernel_modules()
+{
+	if modules_exist; then
+		echo ""
+		echo "Removing RIPTIDE drivers from /lib/modules/`uname -r`/misc/"
+		rm -f "/lib/modules/`uname -r`/misc/riptide"*.o
+	fi
+	return 0
+}
+
+binary_modules_avail()
+{
+	[ -d "${riplibdir}/modules/binaries/$1" ]
+}
+
+choose_kernel()
+{
+	if modules_exist; then
+		echo ""
+		echo "Warning: existing RIPTIDE modules found under /lib/modules/`uname -r`/misc/"
+		if ask_yesno "Would you like to keep using them? [no] " 1; then
+			return 0
+		fi
+	fi
+
+	chosen_binary_modules=""
+	if binary_modules_avail "${OSKERNTYPE}/${OSDISTIDNT}/${OSKERNNAME}-${OSKERNVERS}${OSKERNSMP}"; then
+		chosen_binary_modules="${OSKERNTYPE}/${OSDISTIDNT}/${OSKERNNAME}-${OSKERNVERS}${OSKERNSMP}"
+	fi
+
+	if [ -n "${chosen_binary_modules}" ]; then
+		echo ""
+		echo "Pre-built RIPTIDE modules that seem compatible with your system were found under"
+		echo "${riplibdir}/modules/binaries/${chosen_binary_modules}."
+
+		if ask_yesno "Would you like to use them? [yes] " 0; then
+			if use_prebuilt_modules "${chosen_binary_modules}"; then
+				return 0
+			fi
+		fi
+	else
+		echo ""
+		echo "This package does not contain pre-built modules suitable for your system:"
+		echo "  Distribution: ${OSDISTNAME}-${OSDISTVERS}"
+		echo "  Kernel arch: ${OSKERNTYPE}${OSKERNSMP}"
+		echo "  Kernel version: ${OSKERNNAME}-${OSKERNVERS}"
+	fi
+
+	if [ -f ${riplibdir}/modules/makefile ]; then
+		echo ""
+		echo "Trying to automatically re-compile the modules.."
+		echo "(this requires a C compiler and proper kernel sources to be installed)"
+
+		if recompile_modules; then
+				return 0
+		fi
+	else
+		echo ""
+		echo "Please obtain the appropriate variant of this package for your system"
+		echo "or try the generic RPM or tar version."
+	fi
+
+	return 1
+}
+
+devfsd_running()
+{
+	ps -e | grep -q 'devfsd$'
+}
+
+unconfigure_modules()
+{
+	if [ -f /etc/modutils/riptide ]; then
+		rm -f /etc/modutils/riptide
+		update-modules
+	elif [ -f /etc/modules.d/riptide ]; then
+		rm -f /etc/modules.d/riptide
+		update-modules
+	else
+		if sed -e '/^alias.*riptidelow/d' \
+		< ${modulesconf} > ${modulesconf}.$$; then
+			cp ${modulesconf}.$$ ${modulesconf}
+		fi
+
+		rm -f ${modulesconf}.$$ ${outmodulesconf}
+	fi
+
+	if [ -f /etc/devfsd.conf -o -d /etc/devfs/conf.d ]; then
+		killall -HUP devfsd 2>/dev/null
+		[ -x /usr/sbin/update-devfsd ] && update-devfsd
+	fi
+
+	return 0
+}
+
+sound_slot_used()
+{
+	if [ -e ${modulesconf} ] && \
+		grep -q "^alias[ 	][ 	]*sound-slot-$1[ 	]" ${modulesconf}; then
+			return 0
+	fi
+
+	if [ -e /etc/modules.devfs ] && \
+		grep -q "^alias[ 	][ 	]*sound-slot-$1[ 	]" /etc/modules.devfs; then
+			return 0
+	fi
+
+	return 1
+}
+
+configure_modules()
+{
+	if [ -d /etc/modutils -a -x /sbin/update-modules ]; then
+		# Debian
+		runupdatemodules=true
+		outmodulesconf=/etc/modutils/riptide
+	elif [ -d /etc/modules.d -a -x /usr/sbin/update-modules ]; then
+		# Gentoo
+		runupdatemodules=true
+		outmodulesconf=/etc/modules.d/riptide
+	else
+		runupdatemodules=false
+		outmodulesconf=/tmp/ripmodconf.$$
+	fi
+
+	sndslot=0
+	while [ ${sndslot} -lt 10 ] && sound_slot_used ${sndslot}; do
+		sndslot=`expr ${sndslot} + 1`
+	done
+
+	if [ ${sndslot} -eq 10 ]; then
+		echo ""
+		echo "ERROR: Unable to find free sound-slot"
+		return 1
+	fi
+
+	(
+		echo "alias sound-slot-${sndslot} riptidelow"
+		echo "alias /dev/dsp* riptidelow"
+		echo "alias /dev/sound/dsp* riptidelow"
+		echo "alias /dev/mixer* riptidelow"
+		echo "alias /dev/sound/mixer* riptidelow"
+	) > ${outmodulesconf}
+
+	if ${runupdatemodules}; then
+		update-modules
+	else
+		if (
+			sed -e '/^alias.*riptidelow/d'
+
+			cat ${outmodulesconf}
+
+		) < ${modulesconf} > ${modulesconf}.$$; then
+			if ! cp ${modulesconf}.$$ ${modulesconf}; then
+				rm -f ${modulesconf}.$$ ${outmodulesconf}
+				exit 1
+			fi
+		fi
+
+		rm -f ${modulesconf}.$$ ${outmodulesconf}
+	fi
+
+	depmod -e -a
+
+	if [ -f /etc/devfsd.conf -o -d /etc/devfs/conf.d ]; then
+		[ -x /usr/sbin/update-devfsd ] && update-devfsd
+		killall -HUP devfsd 2>/dev/null
+	fi
+
+	echo ""
+	echo "RIPTIDE module configuration completed."
+	echo ""
+
+	return 0
+}
+
+identify_system()
+{
+	OSDISTNAME=unknown
+	OSDISTIDNT=unknown
+	OSDISTVERS=unknown
+
+	if [ -f /etc/debian_version ]; then
+		OSDISTNAME=Debian
+		OSDISTIDNT=deb
+		read OSDISTVERS < /etc/debian_version
+	elif [ -f /etc/slackware-version ]; then
+		OSDISTNAME=Slackware
+		OSDISTIDNT=slack
+		OSDISTVERS="`${AWK} '{print $1; exit}' /etc/slackware-version`"
+	elif [ -f /etc/conectiva-release ]; then
+		OSDISTNAME=Conectiva
+		OSDISTIDNT=conectiva
+	elif [ -f /etc/SuSE-release ]; then
+		OSDISTNAME=SuSE
+		OSDISTIDNT=suse
+		OSDISTVERS="`sed -n '/^VERSION/s/^.*=[ 	]*//p' < /etc/SuSE-release`"
+	elif [ -f /etc/mandrake-release ]; then
+		OSDISTNAME=Mandrake
+		OSDISTIDNT=mdk
+	#it would be better to use rpm instead of sed but it doesn't work
+	#recursively (due to database locking) when this script is called during
+	#the package's installation
+	#	OSDISTVERS="`rpm -q --queryformat '%{VERSION}\n' mandrake-release | sort -r | head -1`"
+		OSDISTVERS="`sed -n '/release /{s/^.*release  *\([^ ]*\)/\1/;s/ .*//;p;q;}' < /etc/mandrake-release`"
+	#elif [ -f /etc/yellowdog-release ]; then
+	#	OSDISTNAME=YellowDog
+	elif [ -f /etc/turbolinux-release ]; then
+		OSDISTNAME=Turbolinux
+		OSDISTIDNT=turbo
+		OSDISTVERS="`sed -n '/release /{s/^.*release  *\([^ ]*\)/\1/;s/ .*//;p;q;}' < /etc/turbolinux-release`"
+		if [ -z "${OSDISTVERS}" ]; then
+			OSDISTVERS="`sed -n '/[a-zA-Z][a-zA-Z]* /{s/^.*[a-zA-Z][a-zA-Z]*  *\([^ ]*\)/\1/;s/ .*//;p;q;}' < /etc/turbolinux-release`"
+		fi
+	elif [ -f /etc/fedora-release ]; then
+		OSDISTNAME=Fedora
+		OSDISTIDNT=fdr
+		OSDISTVERS="`sed -n '/release /{s/^.*release  *\([^ ]*\)/\1/;s/ .*//;p;q;}' < /etc/fedora-release`"
+	elif [ -f /etc/redhat-release ]; then
+		OSDISTNAME=RedHat
+		OSDISTIDNT=rh
+		OSDISTVERS="`sed -n '/release /{s/^.*release  *\([^ ]*\)/\1/;s/ .*//;p;q;}' < /etc/redhat-release`"
+	elif [ -d /var/lib/LST ]; then
+		OSDISTNAME=Caldera
+		OSDISTIDNT=caldera
+	fi
+
+	OSKERNNAME="`uname -s | tr '[A-Z]' '[a-z]'`"
+	OSKERNARCH="`uname -m`"
+	if [ -r /boot/kernel.h ]; then
+		OSKERNTYPE="`sed -n '/^#define[ 	]__MODULE_KERNEL_/s/^#define[ 	]__MODULE_KERNEL_\([^ 	]*\)[ 	]*.*/\1/p' </boot/kernel.h`"
+	fi
+	if [ -z "${OSKERNTYPE}" ]; then
+		OSKERNTYPE="${OSKERNARCH}"
+	fi
+	OSKERNVERS="`uname -r`"
+
+	if uname -v | grep -q SMP; then
+		OSKERNSMP="-SMP"
+	else
+		OSKERNSMP=""
+	fi
+
+	if [ -r /proc/ksyms -a `grep -c '_R[a-f0-9]*$' /proc/ksyms` -gt 100 ]; then
+		OSKERNMODV="-MODVERS"
+	else
+		OSKERNMODV=""
+	fi
+
+	echo "$OSKERNNAME-$OSKERNARCH($OSKERNTYPE)-$OSKERNVERS$OSKERNSMP$OSKERNMODV $OSDISTNAME-$OSDISTVERS"
+}
+
+dump_cmd()
+{
+	echo ""
+	echo "${dumpprefix} $*"
+	$@
+}
+
+dump_file()
+{
+	dump_cmd cat -v $@
+}
+
+dump_diagnostics()
+{
+	dumpprefix="+"
+
+	> "${ripdiagfile}" || return $?
+
+	if ! ${noprobe}; then
+		echo ""
+		echo "Probing \"riptidesound\" module..."
+		(
+			dump_cmd modprobe -v riptidesound
+			dump_cmd lsmod
+		) >> "${ripdiagfile}" 2>&1
+	fi
+
+	echo ""
+	echo "Dumping system diagnostic information..."
+
+	case "${ripdiagfile}" in
+	*longdiag*)
+		longdiag=true
+		;;
+	*)
+		longdiag=false
+		;;
+	esac
+
+	(
+		dump_cmd date
+		dump_cmd $0 --version
+		dump_cmd identify_system
+		dump_cmd uname -a
+
+		dump_cmd gcc -v
+
+		dump_file /proc/version
+		dump_file /proc/cpuinfo
+
+		for f in /etc/*_version /etc/*-version /etc/*-release; do
+			if [ -r "${f}" ]; then
+				dump_file "${f}"
+			fi
+		done
+
+		dump_cmd lspci -n
+		dump_cmd lspci -v
+		dump_cmd lspci -n -vvv
+
+		for p in pci cmdline uptime \
+			devices misc filesystems interrupts \
+			iomem ioports dma mtrr \
+			partitions mounts swaps meminfo \
+			stat apm modules ldiscs
+		do
+			dump_file /proc/${p}
+		done
+
+		dump_cmd modprobe -V
+		dump_cmd modprobe -l "*riptidesound*"
+		dump_file "${modulesconf}"
+		dump_cmd depmod -e -a
+
+		dump_file /proc/tty/drivers
+		for f in /proc/tty/driver/*; do
+			if [ -r "${f}" ]; then
+				dump_file "${f}"
+			fi
+		done
+
+		dump_cmd ls -l '/dev/modem*'
+		dump_cmd ls -l '/dev/*HCF*'
+		dump_cmd ls -l '/dev/*HSF*'
+		dump_cmd ls -l '/dev/*cnxt*'
+		dump_cmd ls -l '/dev/*rip*'
+
+		dump_cmd ls -lR "${riplibdir}/."
+
+		dump_cmd ls -lR /lib/modules/${OSKERNVERS}/misc
+
+		if ${longdiag}; then
+			for p in slabinfo ksyms
+			do
+				dump_file /proc/${p}
+			done
+
+			dump_file /lib/modules/`uname -r`/build/.config
+			dump_file /lib/modules/`uname -r`/build/include/linux/version.h
+			dump_file /lib/modules/`uname -r`/build/include/linux/autoconf.h
+			dump_file /lib/modules/`uname -r`/build/include/linux/autoconf-up.h
+			dump_file /lib/modules/`uname -r`/build/include/linux/rhconfig.h
+			dump_file /lib/modules/`uname -r`/build/include/linux/modules/ksyms.ver
+
+			dump_file /boot/vmlinuz.version.h
+			dump_file /boot/vmlinuz.autoconf.h
+			dump_file /boot/vmlinuz.config
+
+			dump_file /boot/kernel.h
+
+			dump_cmd ls -lR /etc/.
+			dump_cmd ls -lR /lib/modules/.
+			dump_cmd ls -lR /boot/.
+
+			dump_cmd ls -l /usr/src/linux/include/.
+			dump_cmd ls -l /usr/src/linux/include/linux/.
+			dump_cmd ls -l /usr/src/linux/include/asm-i386/.
+			dump_cmd ls -l /usr/include/. /usr/src/.
+
+			dump_cmd env
+
+			dump_cmd ps -efw
+
+			dump_cmd sh --version
+			dump_cmd sed --version
+			dump_cmd ${AWK} --version
+			dump_cmd printf --version
+
+			dump_cmd tar --version
+
+			dump_cmd rpm --version
+			dump_cmd rpm --showrc
+			dump_cmd rpm --query --all
+		fi
+
+		dump_cmd dmesg
+		if dmesg | grep -qi 'panic'; then
+			dump_cmd dmesg | ksymoops
+		fi
+
+	) >> "${ripdiagfile}" 2>&1
+
+	if [ -f "${ripdiagfile}" ]; then
+		echo ""
+		echo "System diagnostic information has been saved to the file:"
+		echo ""
+		ls -l ${ripdiagfile}
+		echo ""
+		echo "As it could contain private information about this system, we recommend that"
+		echo "you verify its contents before sending it to third parties."
+	fi
+}
+
+show_intro()
+{
+	echo "Linux RIPTIDE audio/communication drivers, version ${ripversion}"
+
+	case "${ripversion}" in
+	*beta*)
+		(
+		echo ""
+		echo "WARNING: this is an EXPERIMENTAL BETA VERSION of the RIPTIDE drivers for Linux."
+		echo "USE AT YOUR OWN RISK! See the file ${riplibdir}/LICENSE for details."
+		) 1>&2
+		;;
+	esac
+
+#	case "${ripversion}" in
+#	*lnxt*)
+		(
+		echo ""
+		echo "Conexant Systems neither distributes nor maintains this package."
+		echo "PLEASE DO NOT CONTACT CONEXANT REGARDING THIS SOFTWARE!!!"
+		echo ""
+		echo "If you require assistance or need more information, go to:"
+		echo "              http://www.linuxant.com/drivers"
+		echo ""
+		echo "When reporting a problem for the first time, please send"
+		echo "us the file generated by \"ripconfig --dumpdiag\"."
+		) 1>&2
+#		;;
+#	esac
+}
+
+
+show_usage_and_exit()
+{
+	show_intro
+
+	cat 1>&2 << EOT
+
+Usage: `basename $0` [options]
+
+  -k, --kernel                 Configure and install RIPTIDE kernel modules
+
+  -d, --dumpdiag[=<file>]      Probe driver modules and dump system diagnostic
+                               information to <file>
+                               (default: ${ripdiagfile})
+
+  -N, --noprobe                Do dumpdiag without probing modules (safer)
+
+  -a, --auto                   Run in automatic mode, without prompting user
+  -r, --remove                 Remove RIPTIDE devices and kernel modules
+
+  -h, --help                   This small usage guide
+  -V, --version                Show RIPTIDE version
+
+Default options if none selected: --kernel
+EOT
+	exit 1
+}
+
+# end of functions; execution starts here
+
+PATH=/usr/sbin:/sbin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin
+export PATH
+
+unset LANG
+
+umask 022
+
+riplibdir="/usr/lib/riptide"
+ripversion="0.6lnxtbeta03122800"
+
+ripdiagfile="/tmp/ripdiag.txt"
+
+if [ -f /etc/modules.conf ]; then
+	modulesconf=/etc/modules.conf
+elif [ -f /etc/conf.modules ]; then
+	modulesconf=/etc/conf.modules
+fi
+
+TEMP=`getopt -a -o kd::NarhV --long kernel,dumpdiag::,noprobe,auto,remove,help,version -n "\`basename $0\`" -- "$@"`
+if [ $? != 0 ]; then
+	show_usage_and_exit
+fi
+
+eval set -- "$TEMP"
+
+automode=false
+noprobe=false
+do_cfgkernel=false
+do_dumpdiag=false
+do_cfgremove=false
+setdiagfile=""
+
+if which gawk >/dev/null 2>&1; then
+	AWK=gawk
+else
+	AWK=awk
+fi
+
+explicitopt=false
+
+while true ; do
+	case "$1" in
+		-a|--auto) automode=true; shift ;;
+		-k|--kernel) explicitopt=true; do_cfgkernel=true; shift ;;
+		-d|--dumpdiag)
+			explicitopt=true
+			do_dumpdiag=true
+			setdiagfile="$2"
+			shift 2
+			;;
+		-N|--noprobe)
+			explicitopt=true
+			do_dumpdiag=true
+			noprobe=true
+			shift
+			;;
+		-r|--remove) explicitopt=true; do_cfgremove=true; shift ;;
+		-h|--help) show_usage_and_exit; shift ;;
+		-V|--version) echo "${ripversion}"; exit 0;;
+		--) shift ; break ;;
+		*) echo "Internal error!" ; exit 1 ;;
+	esac
+done
+
+# Accomodate --dumpdiag <file> as equivalent to --dumpdiag=<file>
+if ${do_dumpdiag} && [ $# -ge 1 -a -z "${setdiagfile}" ]; then
+	setdiagfile="$1"
+	shift
+fi
+
+if [ $# -ne 0 ]; then
+	echo 1>&2 "$0: extraneous arguments: $*"
+	show_usage_and_exit
+fi
+
+# If nothing explicitely specified, configure everything
+if ! ${explicitopt}; then
+	do_cfgkernel=true
+fi
+
+if ! ${do_cfgremove}; then
+	show_intro
+fi
+
+# before doing anything, try to unload any riptide drivers possibly running
+ripstop >/dev/null 2>&1
+
+identify_system >/dev/null
+
+if ${do_cfgremove}; then
+	remove_kernel_modules || exit $?
+	unconfigure_modules || exit $?
+fi
+
+if ${do_cfgkernel}; then
+	check_kernel || exit $?
+	choose_kernel || exit $?
+	configure_modules || exit $?
+fi
+
+if ${do_dumpdiag}; then
+	if [ -n "${setdiagfile}" ]; then
+		ripdiagfile="${setdiagfile}"
+	fi
+	dump_diagnostics || exit $?
+fi

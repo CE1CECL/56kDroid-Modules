@@ -1,0 +1,37 @@
+#!/usr/bin/make -f
+
+export KVERS
+
+CVERSION := $(shell dpkg-parsechangelog | grep '^Version:' | cut -d' ' -f2 | cut -d- -f1)
+
+%:
+	dh $@ -s
+
+override_dh_auto_build:
+	$(MAKE) SUPPORT_ALSA=1 CC="gcc $(shell dpkg-architecture -ei386 || echo -m32)"
+	# Mark slmodemd as not requiring executable stack (LP: #537650)
+	execstack -c modem/slmodemd
+
+	# Make 15sl-modem-daemon executable before install:
+	chmod +x debian/15sl-modem-daemon
+
+override_dh_auto_install:
+	mkdir -p debian/sl-modem-source/usr/src/sl-modem-$(CVERSION)
+
+	# Copy only the driver source to the proper location
+	tar -c --exclude ".svn" modem/modem_defs.h drivers patches ungrab-winmodem | tar x -C debian/sl-modem-source/usr/src/sl-modem-$(CVERSION)
+	sed -e "s/#VERSION#/$(CVERSION)/g" debian/dkms.conf.in > debian/sl-modem-source/usr/src/sl-modem-$(CVERSION)/dkms.conf
+	chmod -R a+r debian/sl-modem-source/
+
+override_dh_installchangelogs:
+	dh_installchangelogs Changes
+
+override_dh_installdebconf:
+	dh_installdebconf
+	perl debian/setcountries.pl debian/sl-modem-daemon/DEBIAN/templates
+
+override_dh_installinit:
+	dh_installinit -n
+
+override_dh_installmodules:
+	dh_installmodules --name=sl-modem

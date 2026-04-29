@@ -1,0 +1,57 @@
+This package contains Linux drivers for the Conexant HCF (controllerless)
+modem family. The latest version and related information are available
+at http://www.linuxant.com on the web.
+
+The drivers should work on most current Linux distributions, with
+the 2.4 or 2.6 kernels. Some systems may require kernel recompilation
+with special ACPI patches.
+
+It will not work on x86_64 (amd64) unless you use a 32-bit Linux
+distribution.
+
+Apple Power Macintosh (PPC) systems require at least kernel 2.4.20.
+
+The following PCI modem devices are recognized by the hcfpcimodem driver:
+
+	PCI ID {127A,14F1}:{1002,1003,1004,1005,1006} (71DP v90)
+	PCI ID {127A,14F1}:{1022,1023,1024,1026}
+	PCI ID {127A,14F1}:{1025,1085,2005} (if it doesn't work, try HSF driver)
+	PCI ID {127A,14F1}:{2004,2006}
+	PCI ID {127A,14F1}:{1032,1033,1034,1035,1036}
+	PCI ID {127A,14F1}:{4321} (RIPTIDE)
+	PCI ID 14F1:{10B3,10B4,10B5,10B6}
+	PCI ID 127A:{1802,1804,1805} (LAN/Modem Combo)
+	PCI ID 14F1:{1813,1815} (LAN/Modem Combo)
+	PCI ID 14F1:{1F10,1F11,1F14,1F15}
+	PCI ID 14F1:{1053,1054,1055,1056} (SmartHCF board rev 3)
+	PCI ID 14F1:{1052,1057,1059} (SmartHCF board rev 4)
+	PCI ID 14F1:{1063,1064,1065,1066} (SmartHCF US-only, Dell)
+	PCI ID 14F1:{1453,1454,1455,1456} (SmartHCF mini-PCI board rev 3)
+	PCI ID 14F1:{1452,1457,1459} (SmartHCF mini-PCI board rev 4)
+	PCI ID 1024:1024 (Zenith Data Systems)
+	PCI ID 148D:1003 (DIGICOM Systems)
+	PCI ID 158B:0015 (Allied Data Technologies Tornado VFM56x-PRC)
+	PCI ID 141A:1035 (Apache Micro)
+
+The following USB modem devices are recognized by the hcfusbmodem driver:
+
+	USB Vendor ID: 0572 Product ID: 1290 (Cadmus2 HCF, Conexant)
+	USB Vendor ID: 05AC Product ID: 8202 (Cadmus2 HCF, Apple)
+
+Many vendors (such as Dell, Compaq/HP, IBM, U.S. Robotics/3Com, etc..) have
+shipped modems based on Conexant modem chipsets. If you have a modem based
+on the HCF chipset but with non-standard vendor or device IDs, please
+contact modem.support@linuxant.com. If supported, your device could be added
+to the list and automatically recognized in future versions of this driver.
+
+See the INSTALL file for installation instructions.
+
+The modem AT command set is described in the file 100498D_RM_HxF_Released.pdf.
+
+Bug reports are welcome. (see section "REPORTING PROBLEMS" in INSTALL file)
+
+Most files in this package are released under terms described in
+the LICENSE file. Some distinct components, located in the
+modules/GPL directory however are covered by the GNU General Public License.
+See the files LICENSE and modules/GPL/COPYING for details.
+

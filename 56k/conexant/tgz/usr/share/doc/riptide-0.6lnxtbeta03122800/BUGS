@@ -1,0 +1,10 @@
+Known problems:
+
+- Still very preliminary and largely untested code.
+- PCI bus hangs during start of the joystick system driver if another
+card with joystick port (0x201) is installed.
+- Multiple instances not yet supported
+
+NOTE: we are hoping that somebody with more time can turn this code
+into a modern ALSA driver someday..
+
