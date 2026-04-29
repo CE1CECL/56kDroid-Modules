@@ -169,7 +169,7 @@ KO= o
 # Configure various machine specific CFLAGS for compiling kernel modules
 #EXTRA_CFLAGS+= -mpreferred-stack-boundary=2
 #EXTRA_CFLAGS+= -fomit-frame-pointer
-EXTRA_CFLAGS += -Wall -Wstrict-prototypes -Werror-implicit-function-declaration -O2 -I$(CNXT_KERNELSRC)/include
+EXTRA_CFLAGS += -Wall -Wstrict-prototypes -Wno-implicit-function-declaration -O2 -I$(CNXT_KERNELSRC)/include
 EXTRA_CFLAGS += -D__KERNEL__ -DMODULE
 
 CONFIG_MODVERSIONS= $(shell echo CONFIG_MODVERSIONS | gcc ${DISTRO_CFLAGS} -E -I${CNXT_KERNELSRC}/include -include ${CNXT_KERNELSRC}/include/linux/config.h - | grep -q 'CONFIG_MODVERSIONS' && echo n || echo y)

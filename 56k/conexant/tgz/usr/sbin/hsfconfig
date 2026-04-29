@@ -645,7 +645,7 @@ kernelrebuild_instructions()
 
 detect_mmx()
 {
-	if [ "hsf" = "hsf" ] && [ "x86_64" = "i386" ] && [ -e /proc/cpuinfo ]; then
+	if [ "hsf" = "hsf" ] && [ "i386" = "i386" ] && [ -e /proc/cpuinfo ]; then
 		grep -q '^flags.*\<mmx\>' /proc/cpuinfo
 		return $?
 	fi
@@ -2824,7 +2824,7 @@ umask 022
 cnxtlibdir="/usr/lib/hsfmodem"
 cnxtetcdir="/etc/hsfmodem"
 cnxtnvmdir="/etc/hsfmodem/nvm"
-cnxtversion="7.80.02.06x86_64oem"
+cnxtversion="7.80.02.06oem"
 
 KERN_CONFIG_WARNING=
 KERN_CONFIG_REQUIRED="SERIAL_CORE"

@@ -10,7 +10,7 @@ diff -urN --show-c-function alsa-driver-git20100411/configure.in alsa-driver-git
 +hrtimer_get_expires_defined="0"
 +ac_save_CFLAGS="$CFLAGS"
 +ac_save_CC="$CC"
-+CFLAGS="$KERNEL_CHECK_CFLAGS -Werror-implicit-function-declaration"
++CFLAGS="$KERNEL_CHECK_CFLAGS -Wno-implicit-function-declaration"
 +CC=$KCC
 +AC_TRY_COMPILE([
 +#define __KERNEL__

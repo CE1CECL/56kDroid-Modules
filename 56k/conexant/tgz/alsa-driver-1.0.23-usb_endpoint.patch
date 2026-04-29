@@ -10,7 +10,7 @@ diff -urN alsa-driver-1.0.23/configure.in alsa-driver-1.0.23-usb_endpoint/config
 +endpoint_dir_defined="0"
 +ac_save_CFLAGS="$CFLAGS"
 +ac_save_CC="$CC"
-+CFLAGS="$KERNEL_CHECK_CFLAGS -Werror-implicit-function-declaration"
++CFLAGS="$KERNEL_CHECK_CFLAGS -Wno-implicit-function-declaration"
 +CC=$KCC
 +AC_TRY_COMPILE([
 +#define __KERNEL__
@@ -40,7 +40,7 @@ diff -urN alsa-driver-1.0.23/configure.in alsa-driver-1.0.23-usb_endpoint/config
 +endpoint_xfer_defined="0"
 +ac_save_CFLAGS="$CFLAGS"
 +ac_save_CC="$CC"
-+CFLAGS="$KERNEL_CHECK_CFLAGS -Werror-implicit-function-declaration"
++CFLAGS="$KERNEL_CHECK_CFLAGS -Wno-implicit-function-declaration"
 +CC=$KCC
 +AC_TRY_COMPILE([
 +#define __KERNEL__
